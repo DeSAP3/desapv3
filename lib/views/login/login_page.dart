@@ -9,11 +9,20 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Login Page")),
       body: Center(
-        child: ElevatedButton(
-            child: const Text("To Home Page"),
-            onPressed: () {
-              Navigator.pushNamed(context, homeRoute);
-            }),
+        child: Column(
+          children: [
+            ElevatedButton(
+                child: const Text("To Home Page"),
+                onPressed: () {
+                  Navigator.pushNamed(context, homeRoute);
+                }),
+            ElevatedButton(
+                child: const Text("To Register Page"),
+                onPressed: () {
+                  Navigator.pushNamed(context, registerRoute);
+                }),
+          ],
+        ),
       ),
     );
   }

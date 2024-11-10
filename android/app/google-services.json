@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "119449793685",
+    "project_id": "desap-96a0a",
+    "storage_bucket": "desap-96a0a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119449793685:android:795bdfcecaca21f593179c",
+        "android_client_info": {
+          "package_name": "com.example.desapv3"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQaWD9b_GK1rYOoAOGV2b_AtzuJuunCCM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
