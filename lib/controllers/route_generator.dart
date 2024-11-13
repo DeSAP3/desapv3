@@ -1,4 +1,5 @@
 import "package:desapv3/controllers/navigation_link.dart";
+import "package:desapv3/services/auth_gate.dart";
 import "package:desapv3/views/homepage/landing_page.dart";
 import "package:desapv3/views/login/login_page.dart";
 import "package:desapv3/views/register/register_page.dart";
@@ -7,16 +8,19 @@ import "package:flutter/material.dart";
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case homeRoute:
-      return MaterialPageRoute(builder: (context) => Homepage());
+      return MaterialPageRoute(builder: (context) => const Homepage());
 
     case loginRoute:
-      return MaterialPageRoute(builder: (context) => LoginPage());
+      return MaterialPageRoute(builder: (context) => const LoginPage());
 
     case registerRoute:
-      return MaterialPageRoute(builder: (context) => RegisterPage());
+      return MaterialPageRoute(builder: (context) => const RegisterPage());
+
+    case authRoute:
+      return MaterialPageRoute(builder: (context) => AuthGate());
 
     default:
-      return MaterialPageRoute(builder: (context) => ErrorPage());
+      return MaterialPageRoute(builder: (context) => const ErrorPage());
   }
 }
 

@@ -32,6 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final fName = TextEditingController();
   final lName = TextEditingController();
   final address = TextEditingController();
+  final profilePic = TextEditingController();
 
   late FToast fToast;
 
@@ -54,8 +55,10 @@ class _RegisterPageState extends State<RegisterPage> {
           steps: steps(),
           onStepContinue: () {
             if (isLastStep) {
-              logger.d("In Firebase Query");
+              logger.d("In Firebase Query${steps().length-1 + currActiveStep}");
+
               if (formKey.currentState!.validate()) {
+                logger.d("In Firebase Auth");
                 _firebaseAuth
                     .createUserWithEmailAndPassword(
                         email: email.text, password: password.text)
@@ -182,9 +185,11 @@ class _RegisterPageState extends State<RegisterPage> {
               obscuringCharacter: '*',
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  toastErrorPopUp(
-                      "Confirm password is not the same as the password initially entered");
                   return "Please reenter your password.";
+                }  else if (value != password.text) {
+                    toastErrorPopUp(
+                      "Confirm password is not the same as the password initially entered");
+                  return "Confirm Password does not match with password";
                 }
                 return null;
               },
@@ -239,8 +244,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 if (value == null || value.isEmpty) {
                   toastErrorPopUp("Last name is required");
                   return "Please enter your last name.";
-                } else if (value != password.text) {
-                  return "Confirm Password does not match with password";
                 }
 
                 return null;
@@ -286,7 +289,7 @@ class _RegisterPageState extends State<RegisterPage> {
               //   }
               //   return null;
               // },
-              controller: fName,
+              controller: profilePic,
               decoration: const InputDecoration(
                   hintText: "Optional Stuff",
                   focusedBorder: OutlineInputBorder(
