@@ -2,6 +2,7 @@ import "package:desapv3/controllers/navigation_link.dart";
 import "package:desapv3/services/firebase_auth_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
+import "package:fluttertoast/fluttertoast.dart";
 import "package:logger/logger.dart";
 
 class Homepage extends StatefulWidget {
@@ -29,17 +30,38 @@ class _HomepageState extends State<Homepage> {
             onPressed: () async {
               logger.d("Logging out");
               await logoutService.signOut();
+
+              if (_firebaseAuth.currentUser == null) {
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, loginRoute, (Route route) => route.isFirst);
+                }
+              } else {
+                toastErrorPopUp(
+                    "We have encountered an issue when logout, please try again.");
+              }
             },
           )
         ],
       ),
       body: Center(
         child: ElevatedButton(
-            child: const Text("Bye"),
+            child: const Text("Back To Login"),
             onPressed: () {
-              Navigator.pushNamed(context, loginRoute);
+              Navigator.pop(context);
             }),
       ),
     );
+  }
+
+  void toastErrorPopUp(String eMsg) {
+    Fluttertoast.showToast(
+        msg: eMsg,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM_RIGHT,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 12.0,
+        timeInSecForIosWeb: 2);
   }
 }

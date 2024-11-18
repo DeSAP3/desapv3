@@ -1,6 +1,7 @@
 import "package:desapv3/controllers/navigation_link.dart";
 import "package:desapv3/services/auth_gate.dart";
 import "package:desapv3/views/homepage/landing_page.dart";
+import "package:desapv3/views/login/forgotten_password_page.dart";
 import "package:desapv3/views/login/login_page.dart";
 import "package:desapv3/views/register/register_page.dart";
 import "package:flutter/material.dart";
@@ -18,6 +19,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
     case authRoute:
       return MaterialPageRoute(builder: (context) => AuthGate());
+
+    case forgottenpasswordRoute:
+      return MaterialPageRoute(builder: (context) => ForgottenPasswordPage());
 
     default:
       return MaterialPageRoute(builder: (context) => const ErrorPage());

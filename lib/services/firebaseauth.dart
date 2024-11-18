@@ -18,14 +18,6 @@ class AuthService {
         errMsg = 'An account with that email has already existed/registered';
       }
 
-      // Fluttertoast.showToast(
-      //     msg: errMsg,
-      //     toastLength: Toast.LENGTH_LONG,
-      //     gravity: ToastGravity.BOTTOM_RIGHT,
-      //     backgroundColor: Colors.red,
-      //     textColor: Colors.white,
-      //     fontSize: 12.0);
-
       toastPopUp(errMsg);
 
     } catch (e) {

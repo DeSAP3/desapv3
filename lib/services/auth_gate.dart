@@ -1,5 +1,6 @@
 import 'package:desapv3/views/homepage/landing_page.dart';
 import 'package:desapv3/views/login/login_page.dart';
+import 'package:desapv3/views/login/verification_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,11 +18,14 @@ class AuthGate extends StatelessWidget {
               if (snapshot.connectionState == ConnectionState.active) {
                 final user = snapshot.data;
                 if (user != null) {
-                  return const Homepage();
+                  if (snapshot.data!.emailVerified == true) {
+                    return const Homepage();
+                  }
+                  return const VerificationPage();
                 } else {
                   return const LoginPage();
                 }
-              } 
+              }
               return const Center(child: CircularProgressIndicator());
             }));
   }

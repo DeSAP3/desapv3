@@ -10,17 +10,16 @@ class FirebaseAuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<User?> signUpWithEmailAndPassword(
-      String email, String password, String role) async {
+      {required String email, required String password}) async {
     try {
-      UserCredential credential = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential credential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
       User? user = credential.user;
 
       if (user != null) {
         // Save user role in Firestore
         await _firestore.collection('User').doc(user.uid).set({
           'email': email,
-          'role': role,
         });
       }
 
@@ -40,15 +39,19 @@ class FirebaseAuthService {
       String email, String password) async {
     try {
       logger.d('Signing in');
-      UserCredential credential = await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
+      UserCredential credential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
       return credential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         toastErrorPopUp(
             "User with the email address entered not found in system's database");
+      } else if (e.code == "invalid-email") {
+        toastErrorPopUp("Email address entered is not valid");
       } else if (e.code == 'wrong-password') {
         toastErrorPopUp("Wrong password");
+      } else if (e.code == 'invalid-credentials') {
+        toastErrorPopUp("Wrong credentials");
       }
     } catch (e) {
       logger.e('Sign Up Error: $e');
@@ -62,15 +65,23 @@ class FirebaseAuthService {
     await _firebaseAuth.signOut();
   }
 
-  Future resetPassword(String email) async {
+  Future<void> resetPassword(String email) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
-      logger.e("Failed to send password reset email: ${e.message}");
+    } catch (e) {
+      logger.e("Failed to send password reset email: ${e.toString()}");
     }
   }
 
-    // Stream for checking authentication status
+  Future<void> sendVerificationEmail() async {
+    try {
+      await _firebaseAuth.currentUser?.sendEmailVerification();
+    } catch (e) {
+      logger.e("Failed ${e.toString()}");
+    }
+  }
+
+  // Stream for checking authentication status
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
 
   // Get current user

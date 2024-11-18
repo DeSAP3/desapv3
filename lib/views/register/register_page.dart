@@ -119,14 +119,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: details.onStepContinue,
                     child: Text(isLastStep ? 'Proceed' : 'Next'),
                   )),
-                  // if (!isFirstStep) ...[
+                  if (!isFirstStep) ...[
                   const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                         onPressed: details.onStepCancel,
                         child: const Text('Back')),
                   )
-                  // ]
+                  ]
                 ],
               )),
         ),
@@ -278,27 +278,27 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ]),
         ),
-        Step(
-          title: const Text('Upload Profile Photo'),
-          isActive: currActiveStep >= 2,
-          content: Column(children: <Widget>[
-            TextFormField(
-              // validator: (value) {
-              //   if (value == null || value.isEmpty) {
-              //     return "Please enter your first name.";
-              //   }
-              //   return null;
-              // },
-              controller: profilePic,
-              decoration: const InputDecoration(
-                  hintText: "Optional Stuff",
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue, width: 2.0)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black, width: 2.0))),
-            ),
-          ]),
-        )
+        // Step(
+        //   title: const Text('Upload Profile Photo'),
+        //   isActive: currActiveStep >= 2,
+        //   content: Column(children: <Widget>[
+        //     TextFormField(
+        //       // validator: (value) {
+        //       //   if (value == null || value.isEmpty) {
+        //       //     return "Please enter your first name.";
+        //       //   }
+        //       //   return null;
+        //       // },
+        //       controller: profilePic,
+        //       decoration: const InputDecoration(
+        //           hintText: "Optional Stuff",
+        //           focusedBorder: OutlineInputBorder(
+        //               borderSide: BorderSide(color: Colors.blue, width: 2.0)),
+        //           enabledBorder: OutlineInputBorder(
+        //               borderSide: BorderSide(color: Colors.black, width: 2.0))),
+        //     ),
+        //   ]),
+        // )
       ];
 
   // bool isFormDetailComplete() {

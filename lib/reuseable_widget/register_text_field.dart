@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TextFieldWidget extends StatelessWidget {
+class RegisterTextField extends StatelessWidget {
   final TextInputType? textInputType;
   final String hintText;
   final String? labelText;
@@ -9,8 +9,9 @@ class TextFieldWidget extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final Icon? prefixIcon;
   final IconButton? suffixIcon;
+  final dynamic value;
 
-  const TextFieldWidget(
+  const RegisterTextField(
       {super.key,
       this.textInputType,
       required this.hintText,
@@ -19,20 +20,20 @@ class TextFieldWidget extends StatelessWidget {
       required this.controller,
       this.validator,
       this.prefixIcon,
-      this.suffixIcon});
+      this.suffixIcon,
+      this.value
+      });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.symmetric(),
       child: TextFormField(
         decoration: InputDecoration(
             filled: true,
-            fillColor: const Color.fromARGB(255, 252, 242, 242),
+            fillColor: const Color.fromARGB(255, 255, 255, 255),
             hintText: hintText,
-            hintStyle: TextStyle(
-              color: Colors.grey.withOpacity(0.7)
-            ),
+            hintStyle: TextStyle(color: Colors.grey.withOpacity(0.5)),
             labelText: labelText,
             border: InputBorder.none,
             focusedBorder: OutlineInputBorder(
@@ -41,6 +42,7 @@ class TextFieldWidget extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(color: Colors.black, width: 1.0),
                 borderRadius: BorderRadius.circular(15)),
+                errorBorder:  const OutlineInputBorder(borderSide: BorderSide(color: Colors.red, width: 1.0)),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon),
         obscureText: obscureText ?? false,
