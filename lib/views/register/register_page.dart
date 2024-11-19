@@ -46,6 +46,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text("User Registration"),),
         body: Center(
       child: Form(
         key: formKey,
@@ -84,8 +85,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   });
                 }).then((value) {
                   if (context.mounted) {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, loginRoute, (route) => false);
+                    Navigator.pushNamed(
+                        context, authRoute);
                   }
                 }).onError((error, stackTrace) {
                   logger.e("Error ${error.toString()}");
@@ -100,7 +101,7 @@ class _RegisterPageState extends State<RegisterPage> {
           onStepCancel: () {
             //just go back to login page
             isFirstStep
-                ? Navigator.pop(context, registerRoute)
+                ? Navigator.pop(context)
                 : setState(() {
                     currActiveStep -= 1;
                   }); //step backing

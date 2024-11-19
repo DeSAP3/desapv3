@@ -21,7 +21,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => AuthGate());
 
     case forgottenpasswordRoute:
-      return MaterialPageRoute(builder: (context) => ForgottenPasswordPage());
+      return MaterialPageRoute(builder: (context) => const ForgottenPasswordPage());
 
     default:
       return MaterialPageRoute(builder: (context) => const ErrorPage());
