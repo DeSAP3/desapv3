@@ -18,6 +18,7 @@ class FirebaseAuthService {
 
       if (user != null) {
         // Save user role in Firestore
+        // Pass data to here to get data in Firebase
         await _firestore.collection('User').doc(user.uid).set({
           'email': email,
         });

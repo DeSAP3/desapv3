@@ -72,7 +72,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     "fName": fName.text,
                     "lName": lName.text,
                     "address": address.text,
-                    "id": FieldValue.increment(1).toString(),
                     // "profilePic": ""
                   };
 
