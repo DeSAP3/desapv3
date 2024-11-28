@@ -45,11 +45,20 @@ class _HomepageState extends State<Homepage> {
         ],
       ),
       body: Center(
-        child: ElevatedButton(
-            child: const Text("Back To Login"),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
+        child: Column(
+          children: [
+            ElevatedButton(
+                child: const Text("To QR"),
+                onPressed: () {
+                  Navigator.pushNamed(context, qrCodeScannerRoute);
+                }),
+            ElevatedButton(
+                child: const Text("To QR Gen"),
+                onPressed: () {
+                  Navigator.pushNamed(context, qrCodeGeneratorRoute);
+                }),
+          ],
+        ),
       ),
     );
   }

@@ -5,5 +5,5 @@ const String authRoute = '/auth_routing';
 const String forgottenpasswordRoute = '/forgotten_password';
 const String homeSentinelRoute = '/homeSentinel';
 const String sentinelInfoRoute = '/sentinelInfo';
-const String qrCodeScanner = '/qrScanner';
-const String qrCodeGenerator = '/qrGenerator';
+const String qrCodeScannerRoute = '/qrScanner';
+const String qrCodeGeneratorRoute = '/qrGenerator';

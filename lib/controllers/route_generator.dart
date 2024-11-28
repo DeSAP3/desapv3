@@ -34,10 +34,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case sentinelInfoRoute:
       return MaterialPageRoute(builder: (context) => const SentinelInfoPage());
 
-    case qrCodeScanner:
+    case qrCodeScannerRoute:
       return MaterialPageRoute(builder: (context) => const QrcodeScanner());
 
-    case qrCodeGenerator:
+    case qrCodeGeneratorRoute:
       return MaterialPageRoute(builder: (context) => const QrcodeGenerator());
 
     default:
