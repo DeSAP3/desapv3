@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppTheme {
+class AppInputTheme {
   // final Color? color;
   // final double? size;
 
@@ -23,7 +23,7 @@ class AppTheme {
       contentPadding: const EdgeInsets.all(16),
       isDense: true, //only works if you don't have padding
       floatingLabelBehavior: FloatingLabelBehavior.always,
-      constraints: const BoxConstraints(maxWidth: 150), //Better wrap the text with flexible instead of this
+      // constraints: const BoxConstraints(maxWidth: 150), //Better wrap the text with flexible instead of this
       enabledBorder: _buildOutlineBorder(Colors.grey[600]!),
       errorBorder: _buildOutlineBorder(Colors.red),
       focusedErrorBorder: _buildOutlineBorder(Colors.redAccent),

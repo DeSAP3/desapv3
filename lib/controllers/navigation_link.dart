@@ -7,3 +7,5 @@ const String homeSentinelRoute = '/homeSentinel';
 const String sentinelInfoRoute = '/sentinelInfo';
 const String qrCodeScannerRoute = '/qrScanner';
 const String qrCodeGeneratorRoute = '/qrGenerator';
+const String addOvitrapRoute = '/addOvitrap';
+const String editOvitrapRoute = '/editOvitrap';

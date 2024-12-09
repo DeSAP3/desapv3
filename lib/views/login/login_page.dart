@@ -42,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             children: [
               SafeArea(
-                  child: SizedBox(
-                      child: Column(
+                  child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
@@ -91,7 +91,8 @@ class _LoginPageState extends State<LoginPage> {
                                     text: TextSpan(children: [
                                   TextSpan(
                                       text: 'Forgot Password?',
-                                      style: const TextStyle(color: Colors.blue),
+                                      style:
+                                          const TextStyle(color: Colors.blue),
                                       recognizer: TapGestureRecognizer()
                                         ..onTap = () => Navigator.pushNamed(
                                             context, forgottenpasswordRoute))
@@ -146,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                     ])),
                   ),
                 ],
-              ))),
+              )),
             ],
           ),
         ),

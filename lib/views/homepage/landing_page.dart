@@ -57,6 +57,11 @@ class _HomepageState extends State<Homepage> {
                 onPressed: () {
                   Navigator.pushNamed(context, qrCodeGeneratorRoute);
                 }),
+            ElevatedButton(
+                child: const Text("To HomeSent"),
+                onPressed: () {
+                  Navigator.pushNamed(context, homeSentinelRoute);
+                }),
           ],
         ),
       ),

@@ -1,8 +1,10 @@
+import 'package:desapv3/models/ovitrap.dart';
 import 'package:flutter/material.dart';
 import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 class QrcodeGenerator extends StatefulWidget {
-  const QrcodeGenerator({super.key});
+  final String currentOvitrapID;
+  const QrcodeGenerator(this.currentOvitrapID, {super.key});
 
   @override
   State<QrcodeGenerator> createState() => _QrcodeGeneratorState();
@@ -10,6 +12,13 @@ class QrcodeGenerator extends StatefulWidget {
 
 class _QrcodeGeneratorState extends State<QrcodeGenerator> {
   String? qrData;
+  late String ovitrapRef;
+
+  @override
+  void initState() {
+    ovitrapRef = widget.currentOvitrapID;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +34,7 @@ class _QrcodeGeneratorState extends State<QrcodeGenerator> {
                 TextField(
                   onSubmitted: (value) {
                     setState(() {
-                      qrData = value;
+                      qrData = ovitrapRef;
                     });
                   },
                 ),
