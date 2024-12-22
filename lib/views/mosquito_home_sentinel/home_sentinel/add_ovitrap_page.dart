@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/controllers/data_controller.dart';
-import 'package:desapv3/models/ovitrap.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -44,35 +42,54 @@ class _AddOvitrapPageState extends State<AddOvitrapPage> {
           child: Center(
               child: Column(
             children: [
-              TextFormField(
-                controller: _location,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _location,
+                  decoration: const InputDecoration(hintText: "Location"),
+                ),
               ),
               const SizedBox(height: 10),
               Row(children: [
                 Flexible(
                   child: TextFormField(
                     controller: _member,
+                    decoration: const InputDecoration(hintText: "Member"),
                   ),
                 ),
-                Flexible(child: TextFormField(controller: _status)),
+                Flexible(
+                    child: TextFormField(
+                      controller: _status,
+                      decoration: const InputDecoration(hintText: "Status"),
+                    )),
               ]),
               const SizedBox(height: 10),
-              Row(children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
                 Flexible(
                   child: TextFormField(
                       controller: _epiWeekInstl,
+                      decoration:
+                          const InputDecoration(hintText: "Epi Week Install"),
                       keyboardType: TextInputType.number),
                 ),
                 Flexible(
                   child: TextFormField(
                       controller: _epiWeekRmv,
+                      decoration:
+                          const InputDecoration(hintText: "Epi Week Remove"),
                       keyboardType: TextInputType.number),
                 ),
               ]),
               const SizedBox(height: 10),
-              Flexible(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: DateTimePicker(
                   type: DateTimePickerType.dateTimeSeparate,
+                  timeHintText: 'Install Time',
+                  dateHintText: 'Install Date',
                   dateMask: 'd MMM, yyyy',
                   initialValue: DateTime.now().toString(),
                   firstDate: DateTime(2000),
@@ -92,9 +109,12 @@ class _AddOvitrapPageState extends State<AddOvitrapPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              Flexible(
+              Padding(
+                padding: const EdgeInsets.all(8.0),
                 child: DateTimePicker(
                   type: DateTimePickerType.dateTimeSeparate,
+                  timeHintText: 'Removal Time',
+                  dateHintText: 'Removal Date',
                   dateMask: 'd MMM, yyyy',
                   initialValue: DateTime.now().toString(),
                   firstDate: DateTime(2000),
@@ -114,7 +134,7 @@ class _AddOvitrapPageState extends State<AddOvitrapPage> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.addOvitrap(
+                    dataProvider.addLocalityCase(
                         _location.text,
                         _member.text,
                         _status.text,

@@ -1,29 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/models/cup.dart';
-import 'package:desapv3/models/ovitrap.dart';
+import 'package:desapv3/models/locality_case.dart';
 import 'package:desapv3/reuseable_widget/string_extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
 class DataController with ChangeNotifier {
-  final List<Ovitrap> _oviTrapList = [];
+  final List<LocalityCase> _localityCaseList = [];
   final List<Cup> _cupList = [];
 
-  bool _isFetchingOviTraps = false;
+  bool _isFetchingLocalityCase = false;
   bool _isFetchingCups = false;
 
-  bool get isOviTrapLoaded => _oviTrapList.isNotEmpty;
-  List<Ovitrap> get oviTrapList => _oviTrapList;
+  bool get isLocalityCaseLoaded => _localityCaseList.isNotEmpty;
+  bool get isCupLoaded => _cupList.isNotEmpty;
+
+  List<LocalityCase> get localityCaseList => _localityCaseList;
   List<Cup> get cupList => _cupList;
-  bool get isFetchingOviTraps => _isFetchingOviTraps;
+
+  bool get isFetchingLocalityCase => _isFetchingLocalityCase;
   bool get isFetchingCups => _isFetchingCups;
 
   FirebaseFirestore dBaseRef = FirebaseFirestore.instance;
 
   final logger = Logger();
 
-  //Creaters
-  Future<void> addOvitrap(
+  //Locality Creators
+  Future<void> addLocalityCase(
       String location,
       String member,
       String status,
@@ -47,7 +50,7 @@ class DataController with ChangeNotifier {
           .collection('OviTrap')
           .add(ovitrapData)
           .then((querySnapshot) {
-        Ovitrap newOviTrap = Ovitrap(
+        LocalityCase newLocalityCase = LocalityCase(
             querySnapshot.id.toString(),
             location,
             member,
@@ -55,9 +58,8 @@ class DataController with ChangeNotifier {
             epiWeekInstl,
             epiWeekRmv,
             instlTime,
-            removeTime,
-            '');
-        _oviTrapList.add(newOviTrap);
+            removeTime, []);
+        _localityCaseList.add(newLocalityCase);
         notifyListeners();
       });
     } catch (e) {
@@ -65,11 +67,11 @@ class DataController with ChangeNotifier {
     }
   }
 
-  //Readers
-  Future<List<Ovitrap>> fetchOviTraps() async {
+  //Locality Readers
+  Future<List<LocalityCase>> fetchLocalityCase() async {
     try {
-      _oviTrapList.clear();
-      _isFetchingOviTraps = true;
+      _localityCaseList.clear();
+      _isFetchingLocalityCase = true;
       notifyListeners();
 
       QuerySnapshot querySnapshot = await dBaseRef.collection('OviTrap').get();
@@ -79,7 +81,7 @@ class DataController with ChangeNotifier {
 
         logger.d(data);
 
-        Ovitrap ovitrap = Ovitrap(
+        LocalityCase ovitrap = LocalityCase(
             doc.id,
             data['location'] ?? '',
             data['member'] ?? '',
@@ -90,11 +92,11 @@ class DataController with ChangeNotifier {
             data['epiWeekRmv'] ?? 0,
             (data['instlTime'] as Timestamp?) ?? Timestamp.now(),
             (data['removeTime'] as Timestamp?) ?? Timestamp.now(),
-            data['cupID'] ?? '');
+            data['cupList'] is Iterable ? List.from(data['cupList']) : []);
 
         logger.d(ovitrap.instlTime);
 
-        _oviTrapList.add(ovitrap);
+        _localityCaseList.add(ovitrap);
         logger.d(ovitrap);
       }
 
@@ -103,55 +105,119 @@ class DataController with ChangeNotifier {
       logger.e(e.message);
       rethrow;
     } finally {
-      _isFetchingOviTraps = false;
+      _isFetchingLocalityCase = false;
       notifyListeners();
     }
 
-    return _oviTrapList;
+    return _localityCaseList;
   }
 
-  //Updater
-  Future<void> updateOvitrap(Ovitrap newOTrap, int index) async {
+  //Locality Updater
+  Future<void> updateLocalityCase(
+      LocalityCase newLocalityCase, int index) async {
     try {
       // Map<String, dynamic> newOviTrapData = {
-      //   'location': newOTrap.location,
-      //   'member': newOTrap.member,
-      //   'status': newOTrap.status,
-      //   'epiWeekInstl': newOTrap.epiWeekInstl,
-      //   'epiWeekRmv': newOTrap.epiWeekRmv,
-      //   'instlTime': newOTrap.instlTime,
-      //   'removeTime': newOTrap.removeTime,
-      //   'cupID': newOTrap.cupID,
+      //   'location': newLocalityCase.location,
+      //   'member': newLocalityCase.member,
+      //   'status': newLocalityCase.status,
+      //   'epiWeekInstl': newLocalityCase.epiWeekInstl,
+      //   'epiWeekRmv': newLocalityCase.epiWeekRmv,
+      //   'instlTime': newLocalityCase.instlTime,
+      //   'removeTime': newLocalityCase.removeTime,
+      //   'cupID': newLocalityCase.cupID,
       // };
 
       // Update in Firestore
-      await dBaseRef.collection('OviTrap').doc(newOTrap.oviTrapID).update({
-        'location': newOTrap.location,
-        'member': newOTrap.member,
-        'status': newOTrap.status,
-        'epiWeekInstl': newOTrap.epiWeekInstl,
-        'epiWeekRmv': newOTrap.epiWeekRmv,
-        'instlTime': newOTrap.instlTime,
-        'removeTime': newOTrap.removeTime,
-        'cupID': newOTrap.cupID,
+      await dBaseRef
+          .collection('OviTrap')
+          .doc(newLocalityCase.oviTrapID)
+          .update({
+        'location': newLocalityCase.location,
+        'member': newLocalityCase.member,
+        'status': newLocalityCase.status,
+        'epiWeekInstl': newLocalityCase.epiWeekInstl,
+        'epiWeekRmv': newLocalityCase.epiWeekRmv,
+        'instlTime': newLocalityCase.instlTime,
+        'removeTime': newLocalityCase.removeTime,
       });
 
       // Optionally fetch updated data or directly add the new object to the list
-      _oviTrapList.update(index, newOTrap);
+      _localityCaseList.update(index, newLocalityCase);
       notifyListeners();
     } catch (e) {
       logger.e('Error adding Ovitrap: ${e.toString()}');
     }
   }
 
-  Future<void> deleteOvitrap(Ovitrap newOTrap) async {
-    await dBaseRef.collection('OviTrap').doc(newOTrap.oviTrapID).delete().then(
-        (doc) => logger.d("Document deleted"),
-        onError: (e) => logger.e("Error deleting document: $e"));
+  Future<void> deleteLocalityCase(LocalityCase delLocalityCase) async {
+    await dBaseRef
+        .collection('OviTrap')
+        .doc(delLocalityCase.oviTrapID)
+        .delete()
+        .then((doc) => logger.d("Document deleted"),
+            onError: (e) => logger.e("Error deleting document: $e"));
 
-    _oviTrapList.remove(newOTrap);
+    _localityCaseList.remove(delLocalityCase);
   }
 
+  // Future<List<Cup>> fetchCups() async {
+  //   try {
+  //     _cupList.clear();
+  //     _isFetchingCups = true;
+  //     notifyListeners();
+
+  //     QuerySnapshot querySnapshot = await dBaseRef.collection('Cup').get();
+
+  //     for (var doc in querySnapshot.docs) {
+  //       Map<String, dynamic> data = doc.data() as Map<String, dynamic>; //toJson
+
+  //       Cup cup = Cup(
+  //           doc.id,
+  //           data['eggCount'] ?? 0,
+  //           data['gpsX'] ?? 0.0,
+  //           data['gpsY'] ?? 0.0,
+  //           data['larvaeCount'] ?? 0,
+  //           data['status'] ?? '',
+  //           data['localityCaseID'] ?? '');
+
+  //       _cupList.add(cup);
+  //       notifyListeners();
+  //       logger.d(cup.cupID);
+  //     }
+  //   } catch (e) {
+  //     logger.e("Error");
+  //     rethrow;
+  //   }
+
+  //   return _cupList;
+  // }
+
+  //Cup Creator
+  Future<void> addCup(int eggCount, double gpsX, double gpsY, int larvaeCount,
+      String status, String localityCaseID) async {
+    try {
+      Map<String, dynamic> cupData = {
+        'eggCount': eggCount,
+        'gpsX': gpsX,
+        'gpsY': gpsY,
+        'larvaeCount': larvaeCount,
+        'status': status,
+        'localityCaseID': localityCaseID
+      };
+
+      // Add to Firestore
+      await dBaseRef.collection('Cup').add(cupData).then((querySnapshot) {
+        Cup newCup = Cup(querySnapshot.id.toString(), eggCount, gpsX, gpsY,
+            larvaeCount, status, localityCaseID);
+        _cupList.add(newCup);
+        notifyListeners();
+      });
+    } catch (e) {
+      logger.e('Error adding Ovitrap: ${e.toString()}');
+    }
+  }
+
+  //Cup Readers
   Future<List<Cup>> fetchCups() async {
     try {
       _cupList.clear();
@@ -163,23 +229,80 @@ class DataController with ChangeNotifier {
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>; //toJson
 
+        logger.d(data);
+
         Cup cup = Cup(
             doc.id,
             data['eggCount'] ?? 0,
             data['gpsX'] ?? 0.0,
             data['gpsY'] ?? 0.0,
             data['larvaeCount'] ?? 0,
-            data['status'] ?? '');
+            data['status'] ?? '',
+            data['localityCaseID'] ?? '');
+
+        logger.d(cup.cupID);
 
         _cupList.add(cup);
-        notifyListeners();
-        logger.d(cup.cupID);
+        logger.d(cup);
       }
-    } catch (e) {
-      logger.e("Error");
+
+      notifyListeners();
+    } on FirebaseException catch (e) {
+      logger.e(e.message);
       rethrow;
+    } finally {
+      _isFetchingLocalityCase = false;
+      notifyListeners();
     }
 
     return _cupList;
+  }
+
+  //Cup Updater
+  Future<void> updateCup(Cup newCup) async {
+    try {
+      // Map<String, dynamic> newOviTrapData = {
+      //   'location': newLocalityCase.location,
+      //   'member': newLocalityCase.member,
+      //   'status': newLocalityCase.status,
+      //   'epiWeekInstl': newLocalityCase.epiWeekInstl,
+      //   'epiWeekRmv': newLocalityCase.epiWeekRmv,
+      //   'instlTime': newLocalityCase.instlTime,
+      //   'removeTime': newLocalityCase.removeTime,
+      //   'cupID': newLocalityCase.cupID,
+      // };
+
+      // Update in Firestore
+      await dBaseRef.collection('Cup').doc(newCup.cupID).update({
+        'eggCount': newCup.eggCount,
+        'gpsX': newCup.gpsX,
+        'gpsY': newCup.gpsY,
+        'larvaeCount': newCup.larvaeCount,
+        'status': newCup.status,
+        'localityCaseID': newCup.localityCaseID
+      });
+
+      // Optionally fetch updated data or directly add the new object to the list
+      int currentCupIndex =
+          _cupList.indexWhere((cup) => cup.cupID == newCup.cupID);
+
+      if (currentCupIndex != -1) {
+        _cupList[currentCupIndex] = newCup;
+        notifyListeners();
+      } else {
+        logger.e('Cup with ID ${newCup.cupID} not found in the list');
+      }
+    } catch (e) {
+      logger.e('Error updating Cup: ${e.toString()}');
+    }
+  }
+
+  //Cup Deletor
+  Future<void> deleteCup(Cup delCup) async {
+    await dBaseRef.collection('OviTrap').doc(delCup.cupID).delete().then(
+        (doc) => logger.d("Cup deleted"),
+        onError: (e) => logger.e("Error deleting Cup: $e"));
+
+    _cupList.remove(delCup);
   }
 }

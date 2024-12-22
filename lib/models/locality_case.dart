@@ -1,20 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/models/cup.dart';
 
-class Ovitrap {
+class LocalityCase {
   String oviTrapID;
-  String location;
-  String member;
-  String status;
-  int epiWeekInstl;
-  int epiWeekRmv;
-  Timestamp instlTime;
-  Timestamp removeTime;
-  String cupID;
-  Cup? currentCup;
-  //Cup('', 0, 0.0, 0.0, 0, '')
+  String? location;
+  String? member;
+  String? status;
+  int? epiWeekInstl;
+  int? epiWeekRmv;
+  Timestamp? instlTime;
+  Timestamp? removeTime;
+  List<Cup>? cupList;
 
-  Ovitrap(
+
+  LocalityCase(
       this.oviTrapID,
       this.location,
       this.member,
@@ -23,9 +22,9 @@ class Ovitrap {
       this.epiWeekRmv,
       this.instlTime,
       this.removeTime,
-      this.cupID);
+      this.cupList);
 
-  factory Ovitrap.fromFirestore(DocumentSnapshot doc) {
+  factory LocalityCase.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final oviTrapID = doc.id;
     final location = data['location'] ?? '';
@@ -37,17 +36,9 @@ class Ovitrap {
     final epiWeekRmv = data['epiWeekRmv'] ?? 0;
     final instlTime = (data['instlTime'] as Timestamp?) ?? Timestamp.now();
     final removeTime = (data['removeTime'] as Timestamp?) ?? Timestamp.now();
-    final cupID = data['cupID'] ?? '';
+    final cupList = data['cupList'] is Iterable ? List.from(data['cupList']):[];
 
-    return Ovitrap(oviTrapID, location, member, status, epiWeekInstl,
-        epiWeekRmv, instlTime, removeTime, cupID);
-  }
-
-  void setCup(List<Cup> cupList) {
-    for (Cup cup in cupList) {
-      if (cup.cupID == cupID) {
-        currentCup = cup;
-      }
-    }
+    return LocalityCase(oviTrapID, location, member, status, epiWeekInstl,
+        epiWeekRmv, instlTime, removeTime, cupList.cast<Cup>());
   }
 }

@@ -1,6 +1,5 @@
 import 'package:desapv3/controllers/navigation_link.dart';
 import 'package:desapv3/controllers/route_generator.dart';
-import 'package:desapv3/models/ovitrap.dart';
 import 'package:flutter/material.dart';
 import 'package:desapv3/controllers/data_controller.dart';
 import 'package:provider/provider.dart';
@@ -63,19 +62,6 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                     active = active == "delete" ? "none" : "delete";
                   });
                 }),
-            SpeedDialChild(
-                elevation: 0,
-                child: const Icon(
-                  Icons.delete,
-                  color: Colors.blue,
-                ),
-                labelWidget: const Text("Generate Ovitrap QRCode"),
-                backgroundColor: Colors.white70,
-                onTap: () {
-                  setState(() {
-                    active = active == "generateQR" ? "none" : "generateQR";
-                  });
-                }),
           ],
           child: const Icon(Icons.more, color: Colors.white),
         ),
@@ -86,14 +72,14 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
               const SizedBox(height: 25, child: Text("Mosquito Home Sentinel")),
               Flexible(
                 child: FutureBuilder(
-                  future: dataProvider.fetchOviTraps(),
+                  future: dataProvider.fetchLocalityCase(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Center(child: Text('${snapshot.error}'));
                     }
-                    final oviTraps = dataProvider.oviTrapList;
+                    final oviTraps = dataProvider.localityCaseList;
 
                     return ListView.builder(
                         padding: const EdgeInsets.all(16),
@@ -102,43 +88,44 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                           DateTime instlTimeDisplay =
                               DateTime.fromMillisecondsSinceEpoch(
                                   oviTraps[index]
-                                      .instlTime
+                                      .instlTime!
                                       .millisecondsSinceEpoch);
                           DateTime removeTimeDisplay =
                               DateTime.fromMillisecondsSinceEpoch(
                                   oviTraps[index]
-                                      .removeTime
+                                      .removeTime!
                                       .millisecondsSinceEpoch);
-                          return ListTile(
-                            leading: active != 'none'
-                                ? 
-                                IconButton(
-                                    onPressed: () {
-                                      if (active == 'edit') {
-                                        Navigator.pushNamed(
-                                          context,
-                                          editOvitrapRoute,
-                                          arguments: EditOvitrapArguments(
-                                              oviTraps[index], index),
-                                        );
-                                      } else if (active == 'delete') {
-                                        dataProvider
-                                            .deleteOvitrap(oviTraps[index]);
-                                      } else if (active == 'qrcode') {
-                                        Navigator.pushNamed(
-                                            context, qrCodeGeneratorRoute,
-                                            arguments:
-                                                oviTraps[index].oviTrapID);
-                                      }
-                                    },
-                                    icon: Icon(active == 'edit'
-                                        ? Icons.edit
-                                        : Icons.delete)
-                                        )
-                                : null,
-                            title: Text(oviTraps[index].location),
-                            subtitle: Text(
-                              "Member: ${oviTraps[index].member}\t\t\t\t\tStatus: ${oviTraps[index].status}\nEpid Week Inst: ${oviTraps[index].epiWeekInstl}\t\t\t\t\tEpid Week Rmv: ${oviTraps[index].epiWeekRmv}\nInst Time: $instlTimeDisplay\nRmv Time: $removeTimeDisplay",
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context, sentinelInfoRoute, arguments: oviTraps[index].oviTrapID
+                              );
+                            },
+                            child: ListTile(
+                              leading: active != 'none'
+                                  ? IconButton(
+                                      onPressed: () {
+                                        if (active == 'edit') {
+                                          Navigator.pushNamed(
+                                            context,
+                                            editOvitrapRoute,
+                                            arguments: EditOvitrapArguments(
+                                                oviTraps[index], index),
+                                          );
+                                        } else if (active == 'delete') {
+                                          dataProvider.deleteLocalityCase(
+                                              oviTraps[index]);
+                                        }
+                                      },
+                                      icon: Icon(active == 'edit'
+                                          ? Icons.edit
+                                          : Icons.delete))
+                                  : null,
+                              title: Text(oviTraps[index].location!),
+                              subtitle: Text(
+                                "Member: ${oviTraps[index].member}\t\t\t\t\tStatus: ${oviTraps[index].status}\nEpid Week Inst: ${oviTraps[index].epiWeekInstl}\t\t\t\t\tEpid Week Rmv: ${oviTraps[index].epiWeekRmv}\nInst Time: $instlTimeDisplay\nRmv Time: $removeTimeDisplay",
+                              ),
+                              trailing: const Icon(Icons.arrow_forward_ios),
                             ),
                           );
                           // Center(

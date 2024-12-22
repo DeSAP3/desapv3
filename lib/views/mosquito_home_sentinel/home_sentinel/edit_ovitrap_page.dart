@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/controllers/data_controller.dart';
-import 'package:desapv3/models/ovitrap.dart';
+import 'package:desapv3/models/locality_case.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 
 class EditOvitrapPage extends StatefulWidget {
-  final Ovitrap data;
+  final LocalityCase data;
   final int index;
   const EditOvitrapPage(this.data, this.index, {super.key});
 
@@ -34,7 +34,7 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
   late final Timestamp _instlTime = Timestamp.fromDate(_instlDateTime);
   late final Timestamp _removeTime = Timestamp.fromDate(_removeDateTime);
 
-  late Ovitrap currentOvitrap;
+  late LocalityCase currentOvitrap;
 
   @override
   void initState() {
@@ -48,9 +48,9 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
     final dataProvider = Provider.of<DataController>(context, listen: false);
 
     DateTime oldInstlTime = DateTime.fromMillisecondsSinceEpoch(
-        currentOvitrap.instlTime.millisecondsSinceEpoch);
+        currentOvitrap.instlTime!.millisecondsSinceEpoch);
     DateTime oldRemoveTime = DateTime.fromMillisecondsSinceEpoch(
-        currentOvitrap.instlTime.millisecondsSinceEpoch);
+        currentOvitrap.instlTime!.millisecondsSinceEpoch);
 
     return Scaffold(
         appBar: AppBar(
@@ -65,6 +65,7 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                     controller: _location,
+                    decoration: const InputDecoration(hintText: "Location"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         logger.d("No Location");
@@ -77,6 +78,7 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                 Flexible(
                   child: TextFormField(
                       controller: _member,
+                      decoration: const InputDecoration(hintText: "Member"),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           logger.d("No Member");
@@ -87,6 +89,7 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                 Flexible(
                     child: TextFormField(
                         controller: _status,
+                        decoration: const InputDecoration(hintText: "Status"),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             logger.d("No Status");
@@ -99,6 +102,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                 Flexible(
                   child: TextFormField(
                       controller: _epiWeekInstl,
+                      decoration:
+                          const InputDecoration(hintText: "Epi Week Install"),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -110,6 +115,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                 Flexible(
                   child: TextFormField(
                       controller: _epiWeekRmv,
+                      decoration:
+                          const InputDecoration(hintText: "Epi Week Remove"),
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -123,6 +130,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
               Flexible(
                 child: DateTimePicker(
                   type: DateTimePickerType.dateTimeSeparate,
+                  timeHintText: 'Install Time',
+                  dateHintText: 'Install Date',
                   dateMask: 'd MMM, yyyy',
                   initialValue: oldInstlTime.toString(),
                   firstDate: DateTime(2000),
@@ -145,6 +154,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
               Flexible(
                 child: DateTimePicker(
                   type: DateTimePickerType.dateTimeSeparate,
+                  timeHintText: 'Removal Time',
+                  dateHintText: 'Removal Date',
                   dateMask: 'd MMM, yyyy',
                   initialValue: oldRemoveTime.toString(),
                   firstDate: DateTime(2000),
@@ -164,8 +175,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.updateOvitrap(
-                        Ovitrap(
+                    dataProvider.updateLocalityCase(
+                        LocalityCase(
                             currentOvitrap.oviTrapID,
                             _location.text,
                             _member.text,
@@ -173,8 +184,7 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                             int.parse(_epiWeekInstl.text),
                             int.parse(_epiWeekRmv.text),
                             _instlTime,
-                            _removeTime,
-                            currentOvitrap.cupID),
+                            _removeTime, []),
                         widget.index);
                     logger.d(const Text("Edited"));
                     Navigator.pop(context);

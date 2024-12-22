@@ -9,3 +9,5 @@ const String qrCodeScannerRoute = '/qrScanner';
 const String qrCodeGeneratorRoute = '/qrGenerator';
 const String addOvitrapRoute = '/addOvitrap';
 const String editOvitrapRoute = '/editOvitrap';
+const String addCupRoute = '/addCup';
+const String editCupRoute = '/editCup';
