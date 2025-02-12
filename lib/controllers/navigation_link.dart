@@ -11,3 +11,4 @@ const String addOvitrapRoute = '/addOvitrap';
 const String editOvitrapRoute = '/editOvitrap';
 const String addCupRoute = '/addCup';
 const String editCupRoute = '/editCup';
+const String mosquitoMapRoute = '/mosquitoMap';

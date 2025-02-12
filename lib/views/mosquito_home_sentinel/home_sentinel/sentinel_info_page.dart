@@ -78,16 +78,16 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
             SpeedDialChild(
                 elevation: 0,
                 child: const Icon(
-                  Icons.qr_code,
+                  Icons.local_activity,
                   color: Colors.blue,
                 ),
-                labelWidget: const Text("Generate Cup QRCode"),
+                labelWidget: const Text("Activate Cup"),
                 backgroundColor: Colors.white70,
                 onTap: () {
                   setState(() {
-                    active = active == "generateQR" ? "none" : "generateQR";
+                    active = active == "activate" ? "none" : "activate";
                   });
-                }),
+                })
           ],
           child: const Icon(Icons.more, color: Colors.white),
         ),
@@ -116,55 +116,30 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
                         itemBuilder: (context, index) {
                           return ListTile(
                             leading: active != 'none'
-                                ? Row(
-                                    mainAxisSize: MainAxisSize
-                                        .min, // Ensures the row doesn't take excessive space
-                                    children: [
-                                      IconButton(
-                                        onPressed: () {
-                                          if (active == 'edit') {
-                                            Navigator.pushNamed(
-                                              context,
-                                              editOvitrapRoute,
-                                              arguments: EditCupArguments(
-                                                  cups[index]),
-                                            );
-                                          }
-                                        },
-                                        icon: const Icon(Icons.edit,
-                                            color: Colors.blue),
-                                        tooltip: "Edit",
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          if (active == 'delete') {
-                                            dataProvider.deleteCup(cups[index]);
-                                          }
-                                        },
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.blue),
-                                        tooltip: "Delete",
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          logger.d("In QR");
-                                            Navigator.pushNamed(
-                                              context,
-                                              qrCodeGeneratorRoute,
-                                              arguments: QrCodeGenArguments(
-                                                  cups[index].cupID, index),
-                                            );
-                                        },
-                                        icon: const Icon(Icons.qr_code,
-                                            color: Colors.blue),
-                                        tooltip: "Generate QR Code",
-                                      ),
-                                    ],
+                                ? IconButton(
+                                    onPressed: () {
+                                      if (active == 'edit') {
+                                        Navigator.pushNamed(
+                                          context,
+                                          editCupRoute,
+                                          arguments:
+                                              EditCupArguments(cups[index]),
+                                        );
+                                      } else if (active == 'delete') {
+                                        dataProvider.deleteCup(cups[index]);
+                                      } else if (active == 'activate') {
+                                        logger.d("In Activation");
+                                        dataProvider.updateCupActivity(
+                                            currentLocalityCaseID, cups[index]);
+                                      }
+                                    },
+                                    icon: Icon(functionIcon(active)),
+                                    tooltip: "Edit",
                                   )
                                 : null,
                             title: Text(cups[index].cupID!),
                             subtitle: Text(
-                              "Mosquito Egg Count: ${cups[index].eggCount}\nCoordinate X: ${cups[index].gpsX}\t\t\t\t\tCoordinate Y: ${cups[index].gpsY}\nLarvae Count: ${cups[index].larvaeCount}\nCup Status: ${cups[index].status}",
+                              "Mosquito Egg Count: ${cups[index].eggCount}\nCoordinate X: ${cups[index].gpsX}\t\t\t\t\tCoordinate Y: ${cups[index].gpsY}\nLarvae Count: ${cups[index].larvaeCount}\t\t\tIn Use: ${cups[index].isActive ? 'Yes' : 'No'}\nCup Status: ${cups[index].status}",
                             ),
                           );
                         });
@@ -174,5 +149,19 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
             ],
           ),
         ));
+  }
+
+  IconData functionIcon(String active) {
+    if (active == 'add') {
+      return Icons.add;
+    } else if (active == 'edit') {
+      return Icons.edit;
+    } else if (active == 'delete') {
+      return Icons.delete;
+    } else if (active == 'activate') {
+      return Icons.local_activity;
+    }
+
+    return Icons.question_mark;
   }
 }

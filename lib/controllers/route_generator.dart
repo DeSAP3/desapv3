@@ -1,8 +1,9 @@
 import "package:desapv3/controllers/navigation_link.dart";
 import "package:desapv3/models/cup.dart";
-import "package:desapv3/models/locality_case.dart";
+import "package:desapv3/models/ovitrap.dart";
 import "package:desapv3/services/auth_gate.dart";
 import "package:desapv3/views/error_page.dart";
+import "package:desapv3/views/historical_map/mosquito_home_map_page.dart";
 import "package:desapv3/views/homepage/landing_page.dart";
 import "package:desapv3/views/login/forgotten_password_page.dart";
 import "package:desapv3/views/login/login_page.dart";
@@ -46,7 +47,7 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
 
     case qrCodeGeneratorRoute:
     final args = settings.arguments as QrCodeGenArguments;
-      return MaterialPageRoute(builder: (context) => QrcodeGenerator(args.currentCupID!, args.index));
+      return MaterialPageRoute(builder: (context) => QrcodeGenerator(args.currentCupID!));
 
     case addOvitrapRoute:
       return MaterialPageRoute(builder: (context) => const AddOvitrapPage());
@@ -64,13 +65,16 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
           builder: (context) => EditCupPage(args.cup));
 
+    case mosquitoMapRoute:
+      return MaterialPageRoute(builder: (context) => const MosquitoHomePage());
+
     default:
       return MaterialPageRoute(builder: (context) => const ErrorPage());
   }
 }
 
 class EditOvitrapArguments {
-  final LocalityCase ovitrap;
+  final OviTrap ovitrap;
   final int index;
 
   EditOvitrapArguments(this.ovitrap, this.index);
@@ -83,7 +87,6 @@ class EditCupArguments {
 
 class QrCodeGenArguments {
   final String? currentCupID;
-  final int index;
 
-  QrCodeGenArguments(this.currentCupID, this.index);
+  QrCodeGenArguments(this.currentCupID);
 }

@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/controllers/data_controller.dart';
-import 'package:desapv3/models/locality_case.dart';
+import 'package:desapv3/models/ovitrap.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 
 class EditOvitrapPage extends StatefulWidget {
-  final LocalityCase data;
+  final OviTrap data;
   final int index;
   const EditOvitrapPage(this.data, this.index, {super.key});
 
@@ -34,7 +34,7 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
   late final Timestamp _instlTime = Timestamp.fromDate(_instlDateTime);
   late final Timestamp _removeTime = Timestamp.fromDate(_removeDateTime);
 
-  late LocalityCase currentOvitrap;
+  late OviTrap currentOvitrap;
 
   @override
   void initState() {
@@ -175,8 +175,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.updateLocalityCase(
-                        LocalityCase(
+                    dataProvider.updateOviTrap(
+                        OviTrap(
                             currentOvitrap.oviTrapID,
                             _location.text,
                             _member.text,

@@ -1,9 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:desapv3/controllers/data_controller.dart';
 import 'package:desapv3/controllers/navigation_link.dart';
 import 'package:desapv3/controllers/route_generator.dart';
 import 'package:desapv3/models/cup.dart';
+import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:desapv3/services/permissions_handling.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -22,19 +21,20 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
   @override
   void initState() {
     super.initState();
-    requestPermission(permission: Permission.camera);
+    PermissionsHandler phandler; //Fix this to ensure the camera is enabled
   }
 
   final logger = Logger();
-  var _isProcessing = false;
+  bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataController>(context, listen: false);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text("QR Code Scanner"),
+        title: const Text("QR Scanner"),
       ),
       body: Center(
         child: FutureBuilder<List<Cup>>(
@@ -52,7 +52,7 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
               );
             }
 
-            final List<Cup> currentCupList = snapshot.data!;
+            final List<Cup> cupList = snapshot.data!;
 
             return MobileScanner(
               controller: MobileScannerController(
@@ -60,36 +60,56 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
                   returnImage: true),
               onDetect: (capture) async {
                 if (_isProcessing) return;
-                _isProcessing = true;
+                _isProcessing = true; //Prevent page looping
 
                 final List<Barcode> barcodes = capture.barcodes;
-                String? cupIDScanned;
+                String? oviTrapIDScanned;
 
                 for (final barcode in barcodes) {
-                  cupIDScanned = barcode.rawValue;
-                  logger.d("Barcode found! ${barcode.rawValue}");
-                  logger.d(cupIDScanned);
+                  oviTrapIDScanned = barcode.rawValue;
+                  logger.d(oviTrapIDScanned);
                 }
 
-                if (cupIDScanned != null) {
+                if (oviTrapIDScanned != null) {
                   try {
-                    // Locate the corresponding Cup object
-                    final Cup cupToEdit = currentCupList
-                        .firstWhere((cup) => cup.cupID == cupIDScanned);
+                    Cup? cupToEdit = cupList.firstWhere(
+                        (cup) =>
+                            (cup.localityCaseID == oviTrapIDScanned) &&
+                            cup.isActive,
+                        orElse: () => Cup(
+                            null, null, null, null, null, null, false, null));
+                    //Trying to fiter out the cupList associated to Ovitrap, then Navigator.pushReplacementNamed(context, sentinelInfoRoute, arguments: oviTrapIDScanned)
 
-                    await Navigator.pushNamed(context, editCupRoute,
-                        arguments: EditCupArguments(cupToEdit));
+                    if (cupToEdit.cupID != null) {
+                      await Navigator.pushNamed(context, editCupRoute,
+                          arguments: EditCupArguments(cupToEdit));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                              "Current active Cup not found, edit now?"),
+                          action: SnackBarAction(
+                              label: 'Edit',
+                              onPressed: () {
+                                Navigator.pushNamed(context, sentinelInfoRoute,
+                                    arguments: oviTrapIDScanned!);
+                              }),
+                        ),
+                      );
+                    }
 
                     _isProcessing = false;
                   } catch (e) {
                     logger.w(
-                        "Cup with ID $cupIDScanned not found: ${e.toString()}");
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content:
-                            Text("Cup not found for scanned ID: $cupIDScanned"),
-                      ),
-                    );
+                        "Ovitrap with ID $oviTrapIDScanned not found: ${e.toString()}");
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              "Ovitrap not found for scanned ID: $oviTrapIDScanned"),
+                        ),
+                      );
+                    }
                   }
                 } else {
                   logger.w("No valid barcode found.");

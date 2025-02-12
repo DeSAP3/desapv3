@@ -1,5 +1,6 @@
 import 'package:desapv3/controllers/navigation_link.dart';
 import 'package:desapv3/controllers/route_generator.dart';
+import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:desapv3/controllers/data_controller.dart';
 import 'package:provider/provider.dart';
@@ -19,67 +20,80 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataController>(context, listen: false);
     return Scaffold(
+      drawer: const AppDrawer(),
         floatingActionButton: SpeedDial(
-          activeIcon: Icons.close,
-          iconTheme: const IconThemeData(color: Colors.white),
-          buttonSize: const Size(50, 50),
-          curve: Curves.bounceIn,
-          children: [
-            SpeedDialChild(
-                elevation: 0,
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.blue,
-                ),
-                labelWidget: const Text("Add Ovitrap"),
-                backgroundColor: Colors.white70,
-                onTap: () {
-                  Navigator.pushNamed(context, addOvitrapRoute);
-                }),
-            SpeedDialChild(
-                elevation: 0,
-                child: const Icon(
-                  Icons.edit,
-                  color: Colors.blue,
-                ),
-                labelWidget: const Text("Edit Ovitrap"),
-                backgroundColor: Colors.white70,
-                onTap: () {
-                  setState(() {
-                    active = active == "edit" ? "none" : "edit";
-                  });
-                }),
-            SpeedDialChild(
-                elevation: 0,
-                child: const Icon(
-                  Icons.delete,
-                  color: Colors.blue,
-                ),
-                labelWidget: const Text("Delete Ovitrap"),
-                backgroundColor: Colors.white70,
-                onTap: () {
-                  setState(() {
-                    active = active == "delete" ? "none" : "delete";
-                  });
-                }),
-          ],
-          child: const Icon(Icons.more, color: Colors.white),
-        ),
-        appBar: AppBar(),
+            activeIcon: Icons.close,
+            iconTheme: const IconThemeData(color: Colors.white),
+            buttonSize: const Size(50, 50),
+            curve: Curves.bounceIn,
+            children: [
+              SpeedDialChild(
+                  elevation: 0,
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.blue,
+                  ),
+                  labelWidget: const Text("Add Ovitrap"),
+                  backgroundColor: Colors.white70,
+                  onTap: () {
+                    Navigator.pushNamed(context, addOvitrapRoute);
+                  }),
+              SpeedDialChild(
+                  elevation: 0,
+                  child: const Icon(
+                    Icons.edit,
+                    color: Colors.blue,
+                  ),
+                  labelWidget: const Text("Edit Ovitrap"),
+                  backgroundColor: Colors.white70,
+                  onTap: () {
+                    setState(() {
+                      active = active == "edit" ? "none" : "edit";
+                    });
+                  }),
+              SpeedDialChild(
+                  elevation: 0,
+                  child: const Icon(
+                    Icons.delete,
+                    color: Colors.blue,
+                  ),
+                  labelWidget: const Text("Delete Ovitrap"),
+                  backgroundColor: Colors.white70,
+                  onTap: () {
+                    setState(() {
+                      active = active == "delete" ? "none" : "delete";
+                    });
+                  }),
+              SpeedDialChild(
+                  elevation: 0,
+                  child: const Icon(
+                    Icons.qr_code,
+                    color: Colors.blue,
+                  ),
+                  labelWidget: const Text("Generate Ovitrap QRCode"),
+                  backgroundColor: Colors.white70,
+                  onTap: () {
+                    setState(() {
+                      active = active == "generateQR" ? "none" : "generateQR";
+                    });
+                  }),
+            ],
+            child: const Icon(Icons.more, color: Colors.white)), //Button Menu
+        appBar: AppBar(title: const Text("Mosquito Home Sentinel")),
         body: Center(
           child: Column(
             children: [
-              const SizedBox(height: 25, child: Text("Mosquito Home Sentinel")),
               Flexible(
                 child: FutureBuilder(
-                  future: dataProvider.fetchLocalityCase(),
+                  future: dataProvider.fetchOviTrap(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Center(child: Text('${snapshot.error}'));
                     }
-                    final oviTraps = dataProvider.localityCaseList;
+
+                    final oviTraps = dataProvider.oviTrapList;
 
                     return ListView.builder(
                         padding: const EdgeInsets.all(16),
@@ -97,9 +111,8 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                                       .millisecondsSinceEpoch);
                           return GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(
-                                context, sentinelInfoRoute, arguments: oviTraps[index].oviTrapID
-                              );
+                              Navigator.pushNamed(context, sentinelInfoRoute,
+                                  arguments: oviTraps[index].oviTrapID);
                             },
                             child: ListTile(
                               leading: active != 'none'
@@ -113,13 +126,18 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                                                 oviTraps[index], index),
                                           );
                                         } else if (active == 'delete') {
-                                          dataProvider.deleteLocalityCase(
-                                              oviTraps[index]);
+                                          dataProvider
+                                              .deleteOviTrap(oviTraps[index]);
+                                        } else if (active == 'generateQR') {
+                                          Navigator.pushNamed(
+                                            context,
+                                          qrCodeGeneratorRoute,
+                                            arguments: QrCodeGenArguments(
+                                                oviTraps[index].oviTrapID),
+                                          );
                                         }
                                       },
-                                      icon: Icon(active == 'edit'
-                                          ? Icons.edit
-                                          : Icons.delete))
+                                      icon: Icon(functionIcon(active)))
                                   : null,
                               title: Text(oviTraps[index].location!),
                               subtitle: Text(
@@ -128,61 +146,6 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                               trailing: const Icon(Icons.arrow_forward_ios),
                             ),
                           );
-                          // Center(
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.center,
-                          //     children: [
-                          //       Flexible(
-                          //           child: enableEditing
-                          //               ? ElevatedButton(
-                          //                   onPressed: () {},
-                          //                   child: const Icon(Icons.edit))
-                          //               : const SizedBox(
-                          //                   height: 5,
-                          //                   width: 5,
-                          //                   child: Text("Yes"),
-                          //                 )),
-                          //       Flexible(
-                          //           child: Center(
-                          //         child: Column(
-                          //           children: [
-                          //             Text(oviTraps[index].location),
-                          //             Row(
-                          //               children: [
-                          //                 Text(
-                          //                     "Member: ${oviTraps[index].member}"),
-                          //                     const SizedBox(width: 5),
-                          //                 Text(
-                          //                     "Status: ${oviTraps[index].status}")
-                          //               ],
-                          //             ),
-                          //             const SizedBox(height: 10),
-                          //             Row(
-                          //               children: [
-                          //                 Text(
-                          //                   "EpiWeek Inst: ${oviTraps[index].epiWeekInstl}",
-                          //                   maxLines: 1,
-                          //                   overflow: TextOverflow.ellipsis,
-                          //                 ),
-                          //                 Text(
-                          //                     "EpiWeek Rmv: ${oviTraps[index].epiWeekRmv}")
-                          //               ],
-                          //             ),
-                          //             const SizedBox(height: 10),
-                          //             Row(
-                          //               children: [
-                          //                 Text(
-                          //                     "Inst Time: ${oviTraps[index].instlTime}"),
-                          //                 Text(
-                          //                     "Rmv Time: ${oviTraps[index].removeTime}")
-                          //               ],
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       ))
-                          //     ],
-                          //   ),
-                          // );
                         });
                   },
                 ),
@@ -190,5 +153,19 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
             ],
           ),
         ));
+  }
+
+  IconData functionIcon(String active) {
+    if (active == 'add') {
+      return Icons.add;
+    } else if (active == 'edit') {
+      return Icons.edit;
+    } else if (active == 'delete') {
+      return Icons.delete;
+    } else if (active == 'generateQR') {
+      return Icons.qr_code;
+    }
+
+    return Icons.question_mark;
   }
 }

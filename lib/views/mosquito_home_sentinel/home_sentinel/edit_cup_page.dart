@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/controllers/data_controller.dart';
+import 'package:desapv3/controllers/navigation_link.dart';
 import 'package:desapv3/models/cup.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -48,43 +49,79 @@ class _EditCupPageState extends State<EditCupPage> {
               child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: TextFormField(
                   controller: _eggCount,
-                  decoration:
-                      const InputDecoration(hintText: "Mosquito Egg Count"),
+                  decoration: const InputDecoration(
+                      hintText: "Mosquito Egg Count",
+                      labelText: "Mosquito Egg Count"),
                   keyboardType: TextInputType.number,
                 ),
               ),
               const SizedBox(height: 10),
               Row(children: [
                 Flexible(
-                  child: TextFormField(
-                    controller: _larvaeCount,
-                    decoration: const InputDecoration(hintText: "Larvae Count"),
-                    keyboardType: TextInputType.number,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      controller: _larvaeCount,
+                      decoration: const InputDecoration(
+                          hintText: "Larvae Count", labelText: "Larvae Count"),
+                      keyboardType: TextInputType.number,
+                    ),
                   ),
                 ),
                 Flexible(
-                    child: TextFormField(
-                  controller: _status,
-                  decoration: const InputDecoration(hintText: "Status"),
+                    child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextFormField(
+                    controller: _status,
+                    readOnly: true,
+                    decoration: const InputDecoration(
+                        hintText: "Status",
+                        suffixIcon: Icon(Icons.arrow_drop_down)),
+                    onTap: () async {
+                      final option = await showMenu<String>(
+                          initialValue: '- Select an Option -',
+                          context: context,
+                          position:
+                              const RelativeRect.fromLTRB(100, 100, 100, 100),
+                          items: const [
+                            PopupMenuItem(
+                              value: 'In Use',
+                              child: Text('In Use'),
+                            ),
+                            PopupMenuItem(
+                              value: 'Collected',
+                              child: Text('Collected'),
+                            ),
+                            PopupMenuItem(
+                              value: 'Broken',
+                              child: Text('Broken'),
+                            ),
+                          ]);
+
+                      if (option != null) {
+                        _status.text = option.toString();
+                      }
+                    },
+                  ),
                 )),
               ]),
               const SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.updateCup(
-                        Cup(
-                            currentCupInEdit.cupID,
-                            int.parse(_eggCount.text),
-                            0,
-                            0,
-                            int.parse(_larvaeCount.text),
-                            _status.text,
-                            currentCupInEdit.localityCaseID));
+                    dataProvider.updateCup(Cup(
+                        currentCupInEdit.cupID,
+                        int.parse(_eggCount.text),
+                        0,
+                        0,
+                        int.parse(_larvaeCount.text),
+                        _status.text,
+                        currentCupInEdit.isActive,
+                        currentCupInEdit.localityCaseID));
                     logger.d(const Text("Updating Cup in Firebase"));
-                    Navigator.pop(context);
+                    Navigator.popAndPushNamed(context, sentinelInfoRoute, arguments: currentCupInEdit.localityCaseID);
                   },
                   child: const Text("Update Cup"))
             ],

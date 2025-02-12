@@ -1,35 +1,55 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Future<void> requestPermission({required Permission permission}) async {
-  final status = await permission.status;
-  if (status.isGranted) {
-    debugPrint('Permission already granted');
-  } else if (status.isDenied) {
-    if (await permission.request().isGranted) {
-      debugPrint("Permission accepted");
+Logger logger = Logger();
+
+class PermissionsHandler {
+  Future<bool> requestPermission({required Permission permission}) async {
+    PermissionStatus status = await permission.status;
+
+    if (status.isGranted) {
+      logger.d('Permission Already Granted');
+      return true;
     } else {
-      debugPrint("Permission denied");
+      
+      status = await permission.request();
+
+      if (status.isGranted) {
+        logger.d("Permission Accepted");
+        return true;
+      } else if (status.isPermanentlyDenied) {
+        logger.d("Permission Permanently Denied. Enable it in settings.");
+        await openAppSettings();
+      } else {
+        logger.e('Permission Denied');
+        return false;
+      }
     }
-  } else {
-    debugPrint('Permission denied');
+
+    return false;
   }
-}
 
-Future<void> requestMultiplePermission() async {
-  final statusMap = await [
-    Permission.microphone,
-    Permission.camera,
-    Platform.isIOS ? Permission.photos : Permission.storage,
-    Permission.locationWhenInUse
-  ].request();
+  Future<bool> requestMultiplePermission() async {
+    final statusMap = await [
+      Permission.microphone,
+      Permission.camera,
+      Platform.isIOS ? Permission.photos : Permission.storage,
+      Permission.location,
+      Permission.locationWhenInUse,
+    ].request();
 
-  debugPrint(
-      "PermissionStatus Microphone: ${statusMap[Permission.microphone]}");
-  debugPrint("PermissionStatus Microphone: ${statusMap[Permission.camera]}");
-  debugPrint(
-      "PermissionStatus Microphone: ${statusMap[Platform.isIOS ? Permission.photos : Permission.storage]}");
-  debugPrint(
-      "PermissionStatus Microphone: ${statusMap[Permission.locationWhenInUse]}");
+    debugPrint(
+        "PermissionStatus Microphone: ${statusMap[Permission.microphone]}");
+    debugPrint("PermissionStatus Camera: ${statusMap[Permission.camera]}");
+    debugPrint(
+        "PermissionStatus Photo Access: ${statusMap[Platform.isIOS ? Permission.photos : Permission.storage]}");
+    debugPrint(
+        "PermissionStatus Microphone: ${statusMap[Permission.locationWhenInUse]}");
+
+    return statusMap.values.every((status) => status.isGranted);
+  }
+
+  Future<bool> requestPermissionWithSettings() => openAppSettings();
 }

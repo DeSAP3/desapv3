@@ -134,7 +134,7 @@ class _AddOvitrapPageState extends State<AddOvitrapPage> {
               ),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.addLocalityCase(
+                    dataProvider.addOviTrap(
                         _location.text,
                         _member.text,
                         _status.text,

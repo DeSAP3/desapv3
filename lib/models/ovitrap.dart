@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/models/cup.dart';
 
-class LocalityCase {
+class OviTrap {
   String oviTrapID;
   String? location;
   String? member;
@@ -13,7 +13,7 @@ class LocalityCase {
   List<Cup>? cupList;
 
 
-  LocalityCase(
+  OviTrap(
       this.oviTrapID,
       this.location,
       this.member,
@@ -24,7 +24,7 @@ class LocalityCase {
       this.removeTime,
       this.cupList);
 
-  factory LocalityCase.fromFirestore(DocumentSnapshot doc) {
+  factory OviTrap.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     final oviTrapID = doc.id;
     final location = data['location'] ?? '';
@@ -38,7 +38,7 @@ class LocalityCase {
     final removeTime = (data['removeTime'] as Timestamp?) ?? Timestamp.now();
     final cupList = data['cupList'] is Iterable ? List.from(data['cupList']):[];
 
-    return LocalityCase(oviTrapID, location, member, status, epiWeekInstl,
+    return OviTrap(oviTrapID, location, member, status, epiWeekInstl,
         epiWeekRmv, instlTime, removeTime, cupList.cast<Cup>());
   }
 }

@@ -7,10 +7,11 @@ class Cup {
   double? gpsY;
   int? larvaeCount;
   String? status;
-  String? localityCaseID;
+  bool isActive = false;
+  String? localityCaseID; //Need change in DB also
 
   Cup(this.cupID, this.eggCount, this.gpsX, this.gpsY, this.larvaeCount,
-      this.status, this.localityCaseID);
+      this.status, this.isActive, this.localityCaseID);
 
   factory Cup.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -20,8 +21,10 @@ class Cup {
     final gpsY = data['gpsX'] ?? 1.2;
     final larvaeCount = data['larvaeCount'] ?? 0;
     final status = data['status'] ?? '';
+    final isActive = data['isActive'] ?? false;
     final localityCaseID = data['localityCaseID'] ?? '';
 
-    return Cup(cupID, eggCount, gpsX, gpsY, larvaeCount, status, localityCaseID);
+    return Cup(
+        cupID, eggCount, gpsX, gpsY, larvaeCount, status, isActive, localityCaseID);
   }
 }

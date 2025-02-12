@@ -1,4 +1,5 @@
 import "package:desapv3/controllers/navigation_link.dart";
+import "package:desapv3/reuseable_widget/app_drawer.dart";
 import "package:desapv3/services/firebase_auth_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
@@ -22,6 +23,7 @@ class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
         title: const Text("Home Page"),
         actions: [
