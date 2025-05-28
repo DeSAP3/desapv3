@@ -18,7 +18,7 @@ class Cup {
     final cupID = doc.id;
     final eggCount = data['eggCount'] ?? 0;
     final gpsX = data['gpsX'] ?? 1.2;
-    final gpsY = data['gpsX'] ?? 1.2;
+    final gpsY = data['gpsY'] ?? 1.2;
     final larvaeCount = data['larvaeCount'] ?? 0;
     final status = data['status'] ?? '';
     final isActive = data['isActive'] ?? false;

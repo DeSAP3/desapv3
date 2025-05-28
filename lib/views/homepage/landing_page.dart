@@ -49,21 +49,21 @@ class _HomepageState extends State<Homepage> {
       body: Center(
         child: Column(
           children: [
-            ElevatedButton(
-                child: const Text("To QR"),
-                onPressed: () {
-                  Navigator.pushNamed(context, qrCodeScannerRoute);
-                }),
-            ElevatedButton(
-                child: const Text("To QR Gen"),
-                onPressed: () {
-                  Navigator.pushNamed(context, qrCodeGeneratorRoute);
-                }),
-            ElevatedButton(
-                child: const Text("To HomeSent"),
-                onPressed: () {
-                  Navigator.pushNamed(context, homeSentinelRoute);
-                }),
+            // ElevatedButton(
+            //     child: const Text("To QR"),
+            //     onPressed: () {
+            //       Navigator.pushNamed(context, qrCodeScannerRoute);
+            //     }),
+            // ElevatedButton(
+            //     child: const Text("To QR Gen"),
+            //     onPressed: () {
+            //       Navigator.pushNamed(context, qrCodeGeneratorRoute);
+            //     }),
+            // ElevatedButton(
+            //     child: const Text("To HomeSent"),
+            //     onPressed: () {
+            //       Navigator.pushNamed(context, homeSentinelRoute);
+            //     }),
           ],
         ),
       ),

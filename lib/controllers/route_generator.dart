@@ -2,6 +2,8 @@ import "package:desapv3/controllers/navigation_link.dart";
 import "package:desapv3/models/cup.dart";
 import "package:desapv3/models/ovitrap.dart";
 import "package:desapv3/services/auth_gate.dart";
+import "package:desapv3/views/dengue_case/dengue_approval_page.dart";
+import "package:desapv3/views/dengue_case/dengue_report_page.dart";
 import "package:desapv3/views/error_page.dart";
 import "package:desapv3/views/historical_map/mosquito_home_map_page.dart";
 import "package:desapv3/views/homepage/landing_page.dart";
@@ -40,14 +42,16 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => const HomeSentinelPage());
 
     case sentinelInfoRoute:
-      return MaterialPageRoute(builder: (context) => SentinelInfoPage(settings.arguments as String));
+      return MaterialPageRoute(
+          builder: (context) => SentinelInfoPage(settings.arguments as String));
 
     case qrCodeScannerRoute:
       return MaterialPageRoute(builder: (context) => const QrcodeScanner());
 
     case qrCodeGeneratorRoute:
-    final args = settings.arguments as QrCodeGenArguments;
-      return MaterialPageRoute(builder: (context) => QrcodeGenerator(args.currentCupID!));
+      final args = settings.arguments as QrCodeGenArguments;
+      return MaterialPageRoute(
+          builder: (context) => QrcodeGenerator(args.currentCupID!));
 
     case addOvitrapRoute:
       return MaterialPageRoute(builder: (context) => const AddOvitrapPage());
@@ -58,15 +62,21 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
           builder: (context) => EditOvitrapPage(args.ovitrap, args.index));
 
     case addCupRoute:
-      return MaterialPageRoute(builder: (context) => AddCupPage(settings.arguments as String));
+      return MaterialPageRoute(
+          builder: (context) => AddCupPage(settings.arguments as String));
 
     case editCupRoute:
       final args = settings.arguments as EditCupArguments;
-      return MaterialPageRoute(
-          builder: (context) => EditCupPage(args.cup));
+      return MaterialPageRoute(builder: (context) => EditCupPage(args.cup));
 
     case mosquitoMapRoute:
       return MaterialPageRoute(builder: (context) => const MosquitoHomePage());
+
+    case dengueReportRoute:
+      return MaterialPageRoute(builder: (context) => const DengueReport());
+
+    case dengueApprovalRoute:
+      return MaterialPageRoute(builder: (context) => const DengueApproval());
 
     default:
       return MaterialPageRoute(builder: (context) => const ErrorPage());

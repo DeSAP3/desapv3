@@ -28,7 +28,7 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
   // geoJsonParser.parseGeoJson(geoJsonData);
 
   String active = "none";
-  int heatMapRadius = 200;
+  int heatMapRadius = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,9 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
     Widget radius200AreaButton = TextButton(
       child: const Text("200m"),
       onPressed: () {
-        heatMapRadius = 200;
+        setState(() {
+          heatMapRadius = 200;
+        });
         Navigator.of(context).pop();
       },
     );
@@ -45,7 +47,9 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
     Widget radius400AreaButton = TextButton(
       child: const Text("400m"),
       onPressed: () {
-        heatMapRadius = 400;
+        setState(() {
+          heatMapRadius = 400;
+        });
         Navigator.of(context).pop();
       },
     );
@@ -102,7 +106,9 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                   backgroundColor: Colors.white70,
                   onTap: () {
                     setState(() {
-                      active = active == "breedingSiteCalc" ? "none" : "breedingSiteCalc";
+                      active = active == "breedingSiteCalc"
+                          ? "none"
+                          : "breedingSiteCalc";
                     });
                   }),
             ],
@@ -137,17 +143,6 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                     c.gpsX!,
                     c.gpsY!,
                   ),
-                  // child: IconButton(
-                  //     onPressed: () {
-                  //       // showDialog(
-                  //       //     context: context,
-                  //       //     builder: (context) => const AlertDialog());
-                  //     },
-                  //     icon: const Icon(
-                  //       Icons.location_pin,
-                  //       size: 30,
-                  //       color: Colors.red,
-                  //     )),
                   child: const Icon(
                     Icons.location_on,
                     color: Colors.red,
@@ -174,27 +169,22 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                             userAgentPackageName: 'com.example.app'),
                         MarkerLayer(markers: _markerList),
-                        // CircleLayer(
-                        //   circles:
-                        //       _generateCircles(cupCoordinates, 200), //add 400m
-                        // ),
-                        // PolygonLayer(polygons: geoJsonParser.polygons),
+                        //Active Button, Choose Distance, Then Refresh (Change where condition I think)
                         PolygonLayer(
                           polygons: cupCoordinates
-                              .where((center) =>
-                                  active == "heatMap")
+                              .where((center) => active == "heatMap")
                               .map((center) => Polygon(
                                     points: mapDataGen.generateCirclePolygon(
                                         center, heatMapRadius),
                                     color:
-                                        const Color.fromARGB(148, 218, 108, 19),
+                                        const Color.fromARGB(147, 218, 172, 19),
                                   ))
                               .toList(),
                         ),
                         PolygonLayer(
                           polygons: centroids
-                              .where((cenCentroid) =>
-                                  active == "breedingSiteCalc")
+                              .where(
+                                  (cenCentroid) => active == "breedingSiteCalc")
                               .map((cenCentroid) => Polygon(
                                     points: mapDataGen.generateCirclePolygon(
                                         cenCentroid, heatMapRadius),
@@ -208,25 +198,4 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
               );
             }));
   }
-
-  // Polygon displayHeatCircle(String mode, LatLng cupCenterPoint, int radius) {
-  //   if (mode == "heatMap") {
-  //     return Polygon(
-  //       points: mapDataGen.generateCirclePolygon(cupCenterPoint, heatMapRadius),
-  //       color: const Color.fromARGB(150, 240, 243, 33),
-  //     );
-  //   }
-
-  //   return Polygon(points: []);
-  // }
-
-  // List<CircleMarker> _generateCircles(
-  //     List<LatLng> cupCoordinates, double radius) {
-  //   return cupCoordinates.map((coordinates) {
-  //     return CircleMarker(
-  //         point: coordinates,
-  //         radius: radius,
-  //         color: const Color.fromARGB(100, 244, 10, 10));
-  //   }).toList();
-  // }
 }
