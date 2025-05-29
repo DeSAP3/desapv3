@@ -1,12 +1,18 @@
 import 'package:desapv3/controllers/navigation_link.dart';
+import 'package:desapv3/controllers/user_controller.dart';
 import 'package:desapv3/views/historical_map/mosquito_home_map_page.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
+    // Logger logger = Logger();
+    final loggedInUser = Provider.of<UserController>(context).user;
     return Drawer(
       child: ListView(
         padding: const EdgeInsets.all(8),
@@ -20,6 +26,14 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, homeRoute);
             },
           ),
+          // if (loggedInUser?.role == 1) //Change to Admin Only
+            ListTile(
+              leading: const Icon(Icons.list_alt),
+              title: const Text('Dengue Case Report'),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, dengueReportRoute);
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.info_rounded),
             title: const Text('Mosquito Home Sentinel'),

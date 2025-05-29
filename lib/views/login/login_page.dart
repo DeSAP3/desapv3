@@ -1,10 +1,12 @@
 import "package:desapv3/controllers/navigation_link.dart";
+import "package:desapv3/controllers/user_controller.dart";
 import "package:desapv3/reuseable_widget/text_field_widget.dart";
 import "package:desapv3/services/firebase_auth_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/gestures.dart";
 import "package:flutter/material.dart";
 import "package:logger/logger.dart";
+import "package:provider/provider.dart";
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -116,10 +118,21 @@ class _LoginPageState extends State<LoginPage> {
                                       .signInWithEmailAndPassword(
                                           _email.text, _password.text);
 
-                                  if (user != null) {
+                                          print("Here: ${user}");
+
+                                  if (user != null && user!.emailVerified) {
+                                    print("There: ${user}");
                                     if (context.mounted) {
-                                      logger.d("Successfully logged in");
-                                      Navigator.pushNamed(context, homeRoute);
+
+                                      await Provider.of<UserController>(context,
+                                              listen: false)
+                                          .fetchUser(user!.uid);
+                                          
+                                      if (mounted && context.mounted) {
+                                        logger.d("Successfully logged in");
+                                        Navigator.pushReplacementNamed(
+                                            context, homeRoute);
+                                      }
                                     }
                                   }
                                 } on Exception catch (e) {

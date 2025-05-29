@@ -138,7 +138,7 @@ class CircleMapData {
           points.map((p) => [p.longitude, p.latitude]).toList()
         ],
       },
-      "properties": {} // A dditional properties if needed
+      "properties": {} // Additional properties if needed
     };
   }
 }

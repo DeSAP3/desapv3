@@ -1,5 +1,3 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/controllers/data_controller.dart';
 import 'package:desapv3/services/location_map_service.dart';
@@ -24,9 +22,6 @@ class _AddCupPageState extends State<AddCupPage> {
 
   final _eggCount = TextEditingController();
   final _larvaeCount = TextEditingController();
-  // late TextEditingController _gpsX = TextEditingController(text: setCoordX());
-  // late TextEditingController _gpsY =
-  //     TextEditingController(text: coordY.toString());
   final _status = TextEditingController();
 
   late String currentLCID;
@@ -117,28 +112,25 @@ class _AddCupPageState extends State<AddCupPage> {
                 )),
               ]),
               const SizedBox(height: 10),
-              Row(children: [
-                // Flexible(
-                //   child: TextFormField(
-                //     controller: _gpsX,
-                //     decoration: const InputDecoration(
-                //         hintText: "Latitude", labelText: "Latitude"),
-                //     keyboardType: TextInputType.number,
-                //     readOnly: true,
-                //   ),
-                // ),
-                // Flexible(
-                //   child: TextFormField(
-                //     controller: _gpsY,
-                //     decoration: const InputDecoration(
-                //         hintText: "Longitude", labelText: "Longitude"),
-                //     keyboardType: TextInputType.number,
-                //     readOnly: true,
-                //   ),
-                // ),
-                Flexible(child: Text("Coordinate X: ${currentCupLocation?.latitude ?? 'N/A'}\t\t\t\t\t\t"),),
-                Flexible(child: Text("Coordinate Y: ${currentCupLocation?.longitude ?? 'N/A'}"),)
-              ]),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Centers the children in the row
+                children: [
+                  Flexible(
+                    child: Text(
+                      "Coordinate X: ${currentCupLocation?.latitude?.toStringAsFixed(6) ?? 'N/A'}",
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(width: 20), 
+                  Flexible(
+                    child: Text(
+                      "Coordinate Y: ${currentCupLocation?.longitude?.toStringAsFixed(6) ?? 'N/A'}",
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () {

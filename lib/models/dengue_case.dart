@@ -3,10 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DengueCase {
   String? dCaseID;
   String? patientName;
-  String? patientAge;
+  int? patientAge;
   Timestamp? dateRPD;
+  String? address;
   double? infectedCoordsX;
-  double? infectedCoordY;
+  double? infectedCoordsY;
   String? officerName;
   String? status;
   String? userID;
@@ -18,8 +19,9 @@ class DengueCase {
       this.patientName,
       this.patientAge,
       this.dateRPD,
+      this.address,
       this.infectedCoordsX,
-      this.infectedCoordY,
+      this.infectedCoordsY,
       this.officerName,
       this.status,
       this.userID,
@@ -32,6 +34,7 @@ class DengueCase {
     final patientName = data['patientName'] ?? '';
     final patientAge = data['patientAge'] ?? 0;
     final dateRPD = data['dateRPD'] ?? Timestamp.now();
+    final address = data['address'] ?? '';
     final infectedCoordsX = data['infectedCoordsX'] ?? 1.2;
     final infectedCoordsY = data['infectedCoordsY'] ?? 1.2;
     final officerName = data['officerName'] ?? '';
@@ -45,6 +48,7 @@ class DengueCase {
         patientName,
         patientAge,
         dateRPD,
+        address,
         infectedCoordsX,
         infectedCoordsY,
         officerName,

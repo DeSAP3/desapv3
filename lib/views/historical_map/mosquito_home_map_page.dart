@@ -8,6 +8,7 @@ import 'package:flutter_map_heatmap/flutter_heatmap.dart';
 import 'package:flutter_map_heatmap/flutter_map_heatmap.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_map_geojson/flutter_map_geojson.dart';
 
@@ -19,54 +20,27 @@ class MosquitoHomePage extends StatefulWidget {
 }
 
 class _MosquitoHomePageState extends State<MosquitoHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchCupsFuture =
+        Provider.of<DataController>(context, listen: false).fetchCups();
+  }
+
   final MapController _mapControls = MapController();
   final geoJsonParser = GeoJsonParser();
   final mapDataGen = CircleMapData();
 
   final List<Marker> _markerList = [];
 
-  // geoJsonParser.parseGeoJson(geoJsonData);
+  late Future<void> _fetchCupsFuture;
 
   String active = "none";
   int heatMapRadius = 0;
+  Logger logger = Logger();
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataController>(context, listen: false);
-
-    Widget radius200AreaButton = TextButton(
-      child: const Text("200m"),
-      onPressed: () {
-        setState(() {
-          heatMapRadius = 200;
-        });
-        Navigator.of(context).pop();
-      },
-    );
-
-    Widget radius400AreaButton = TextButton(
-      child: const Text("400m"),
-      onPressed: () {
-        setState(() {
-          heatMapRadius = 400;
-        });
-        Navigator.of(context).pop();
-      },
-    );
-
-    Widget cancelButton = TextButton(
-      child: const Text("Cancel"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    AlertDialog radiusSelection = AlertDialog(
-      title: const Text("HeatMap Display"),
-      content: const Text("Choose the Heat Map Display Radius"),
-      actions: [cancelButton, radius200AreaButton, radius400AreaButton],
-    );
-
     return Scaffold(
         drawer: const AppDrawer(),
         appBar: AppBar(
@@ -87,13 +61,43 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                   labelWidget: const Text("Display HeatMap"),
                   backgroundColor: Colors.white70,
                   onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return radiusSelection;
-                        });
+                    logger.d(active);
                     setState(() {
                       active = active == "heatMap" ? "none" : "heatMap";
+                    });
+                    Future.microtask(() {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("HeatMap Display"),
+                              content: const Text(
+                                  "Choose the Heat Map Display Radius"),
+                              actions: [
+                                TextButton(
+                                  child: const Text("200m"),
+                                  onPressed: () {
+                                    heatMapRadius = 200;
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text("400m"),
+                                  onPressed: () {
+                                    heatMapRadius = 400;
+
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text("Cancel"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                )
+                              ],
+                            );
+                          });
                     });
                   }),
               SpeedDialChild(
@@ -114,13 +118,15 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
             ],
             child: const Icon(Icons.more, color: Colors.white)),
         body: FutureBuilder(
-            future: dataProvider.fetchCups(),
+            future: _fetchCupsFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('${snapshot.error}'));
               }
+
+              final dataProvider = Provider.of<DataController>(context);
 
               final cups = dataProvider.cupList
                   .where((cup) => cup.isActive == true)
@@ -135,6 +141,7 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
               late List<LatLng> centroids =
                   mapDataGen.computeCentroids(clusters);
 
+              _markerList.clear();
               for (Cup c in cups) {
                 _markerList.add(Marker(
                   width: 40,

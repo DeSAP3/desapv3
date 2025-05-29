@@ -1,9 +1,13 @@
 import "package:desapv3/controllers/navigation_link.dart";
 import "package:desapv3/models/cup.dart";
+import "package:desapv3/models/dengue_case.dart";
 import "package:desapv3/models/ovitrap.dart";
 import "package:desapv3/services/auth_gate.dart";
+import "package:desapv3/views/dengue_case/add_dengue_case.dart";
 import "package:desapv3/views/dengue_case/dengue_approval_page.dart";
+import "package:desapv3/views/dengue_case/dengue_case_detail.dart";
 import "package:desapv3/views/dengue_case/dengue_report_page.dart";
+import "package:desapv3/views/dengue_case/edit_dengue_case.dart";
 import "package:desapv3/views/error_page.dart";
 import "package:desapv3/views/historical_map/mosquito_home_map_page.dart";
 import "package:desapv3/views/homepage/landing_page.dart";
@@ -78,6 +82,18 @@ Route<dynamic>? generateRoute(RouteSettings settings) {
     case dengueApprovalRoute:
       return MaterialPageRoute(builder: (context) => const DengueApproval());
 
+    case addDengueCaseRoute:
+      return MaterialPageRoute(builder: (context) => const AddDengueCase());
+
+    case editDengueCaseRoute:
+      final args = settings.arguments as EditDengueCaseArguments;
+      return MaterialPageRoute(
+          builder: (context) => EditDengueCase(args.dengueCase, args.index));
+
+    case dengueCaseDetailRoute:
+      final args = settings.arguments as DengueCaseDetailArguments;
+      return MaterialPageRoute(builder: (context) => DengueCaseDetail(args.dc));
+
     default:
       return MaterialPageRoute(builder: (context) => const ErrorPage());
   }
@@ -99,4 +115,16 @@ class QrCodeGenArguments {
   final String? currentCupID;
 
   QrCodeGenArguments(this.currentCupID);
+}
+
+class EditDengueCaseArguments {
+  final DengueCase dengueCase;
+  final int index;
+
+  EditDengueCaseArguments(this.dengueCase, this.index);
+}
+
+class DengueCaseDetailArguments {
+  final DengueCase dc;
+  DengueCaseDetailArguments(this.dc);
 }
