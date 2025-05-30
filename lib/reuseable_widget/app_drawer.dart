@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
-  
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +25,15 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, homeRoute);
             },
           ),
-          // if (loggedInUser?.role == 1) //Change to Admin Only
-            ListTile(
-              leading: const Icon(Icons.list_alt),
-              title: const Text('Dengue Case Report'),
-              onTap: () {
-                Navigator.pushReplacementNamed(context, dengueReportRoute);
-              },
-            ),
+          formattedDivider(),
+          ListTile(
+            leading: const Icon(Icons.list_alt),
+            title: const Text('Dengue Case Report'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, dengueReportRoute);
+            },
+          ),
+          formattedDivider(),
           ListTile(
             leading: const Icon(Icons.info_rounded),
             title: const Text('Mosquito Home Sentinel'),
@@ -41,6 +41,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, homeSentinelRoute);
             },
           ),
+          formattedDivider(),
           ListTile(
             leading: const Icon(Icons.map),
             title: const Text('Historical Map'),
@@ -48,6 +49,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, mosquitoMapRoute);
             },
           ),
+          formattedDivider(),
           ListTile(
             leading: const Icon(Icons.qr_code_scanner),
             title: const Text('QR Scanner'),
@@ -57,6 +59,15 @@ class AppDrawer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget formattedDivider() {
+    return Divider(
+      thickness: 1,
+      color: Colors.grey[500],
+      indent: 8, // Starts 16 px from the left
+      endIndent: 8, // Ends 16 px before the right edge
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:logger/logger.dart';
 
 class DengueCaseController with ChangeNotifier {
   final List<DengueCase> _dengueCaseList = [];
+  bool get isLoading => _isFetchingDengueCase;
 
   bool _isFetchingDengueCase = false;
 
@@ -108,7 +109,6 @@ class DengueCaseController with ChangeNotifier {
         logger.d(dc);
       }
 
-      notifyListeners();
     } on FirebaseException catch (e) {
       logger.e(e.message);
       rethrow;
