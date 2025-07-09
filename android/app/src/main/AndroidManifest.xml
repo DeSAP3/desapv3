@@ -6,7 +6,7 @@
 
 
     <application
-        android:label="desapv3"
+        android:label="DESaP 3"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

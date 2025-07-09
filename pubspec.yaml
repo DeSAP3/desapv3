@@ -60,6 +60,7 @@ dependencies:
   geodesy: ^0.10.2
   flutter_map_geojson: ^1.0.8
   weatherapi: ^1.1.1
+  fl_chart: ^0.71.0
 
 dev_dependencies:
   flutter_test:

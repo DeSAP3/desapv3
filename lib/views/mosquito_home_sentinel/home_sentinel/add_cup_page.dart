@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:desapv3/controllers/data_controller.dart';
+import 'package:desapv3/viewmodels/cup_viewmodel.dart';
+import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
 import 'package:desapv3/services/location_map_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -8,8 +9,8 @@ import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 class AddCupPage extends StatefulWidget {
-  final String localityCaseID;
-  const AddCupPage(this.localityCaseID, {super.key});
+  final String ovitrapID;
+  const AddCupPage(this.ovitrapID, {super.key});
 
   @override
   State<AddCupPage> createState() => _AddCupPageState();
@@ -24,7 +25,7 @@ class _AddCupPageState extends State<AddCupPage> {
   final _larvaeCount = TextEditingController();
   final _status = TextEditingController();
 
-  late String currentLCID;
+  late String currentOvitrapID;
 
   Position? currentCupLocation;
   Placemark? currentPreciseCupLocation;
@@ -35,12 +36,12 @@ class _AddCupPageState extends State<AddCupPage> {
   @override
   void initState() {
     super.initState();
-    currentLCID = widget.localityCaseID;
+    currentOvitrapID = widget.ovitrapID;
   }
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataController>(context, listen: false);
+    final cupProvider = Provider.of<CupViewModel>(context, listen: false);
 
     return Scaffold(
         appBar: AppBar(
@@ -92,6 +93,10 @@ class _AddCupPageState extends State<AddCupPage> {
                             const RelativeRect.fromLTRB(100, 100, 100, 100),
                         items: const [
                           PopupMenuItem(
+                            value: 'Standby',
+                            child: Text('Standby'),
+                          ),
+                          PopupMenuItem(
                             value: 'In Use',
                             child: Text('In Use'),
                           ),
@@ -113,19 +118,18 @@ class _AddCupPageState extends State<AddCupPage> {
               ]),
               const SizedBox(height: 10),
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Centers the children in the row
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Flexible(
                     child: Text(
-                      "Coordinate X: ${currentCupLocation?.latitude?.toStringAsFixed(6) ?? 'N/A'}",
+                      "Coordinate X: ${currentCupLocation?.latitude.toStringAsFixed(6) ?? 'N/A'}",
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(width: 20), 
+                  const SizedBox(width: 20),
                   Flexible(
                     child: Text(
-                      "Coordinate Y: ${currentCupLocation?.longitude?.toStringAsFixed(6) ?? 'N/A'}",
+                      "Coordinate Y: ${currentCupLocation?.longitude.toStringAsFixed(6) ?? 'N/A'}",
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -134,14 +138,14 @@ class _AddCupPageState extends State<AddCupPage> {
               const SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.addCup(
+                    cupProvider.addCup(
                         int.parse(_eggCount.text),
-                        0,
-                        0,
+                        currentCupLocation!.latitude,
+                        currentCupLocation!.longitude,
                         int.parse(_larvaeCount.text),
                         _status.text,
                         false,
-                        currentLCID);
+                        currentOvitrapID);
                     logger.d(const Text("Adding to Firebase"));
                     Navigator.pop(context);
                   },
@@ -156,10 +160,12 @@ class _AddCupPageState extends State<AddCupPage> {
 
     Position? newLocation = await locationService.getCurrentLocation();
 
-    setState(() {
-      currentCupLocation = newLocation;
-      logger.d(currentCupLocation?.latitude);
-    });
+    if (mounted) {
+      setState(() {
+        currentCupLocation = newLocation;
+        logger.d(currentCupLocation?.latitude);
+      });
+    }
 
     await setPreciseCupLocation();
   }
@@ -170,21 +176,11 @@ class _AddCupPageState extends State<AddCupPage> {
     Placemark? newCoordinates =
         await locationService.getAddress(currentCupLocation!);
 
-    setState(() {
-      currentPreciseCupLocation = newCoordinates;
-      logger.d(currentPreciseCupLocation?.locality);
-    });
+    if (mounted) {
+      setState(() {
+        currentPreciseCupLocation = newCoordinates;
+        logger.d(currentPreciseCupLocation?.locality);
+      });
+    }
   }
-
-  // String setCoordX() {
-  //   if (currentCupLocation != null) {
-  //     setState(() {
-  //       coordX = (currentCupLocation?.latitude)!.toDouble();
-  //     });
-
-  //     return coordX.toString();
-  //   }
-
-  //   return coordX.toString();
-  // }
 }

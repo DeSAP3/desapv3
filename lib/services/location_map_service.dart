@@ -15,6 +15,7 @@ class LocationServices {
     if (!servicePermission) {
       logger.e(
           "Location Services Disabled. Please Enable Them in Device Settings"); //Snack bar this please
+          
     } else {
       locationTrackingPermission =
           await phandler.requestPermission(permission: Permission.location);

@@ -1,4 +1,4 @@
-import "package:desapv3/controllers/navigation_link.dart";
+import "package:desapv3/viewmodels/navigation_link.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
 import "package:flutter/material.dart";
@@ -46,92 +46,94 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("User Registration"),),
-        body: Center(
-      child: Form(
-        key: formKey,
-        child: Stepper(
-          type: StepperType.vertical,
-          currentStep: currActiveStep,
-          steps: steps(),
-          onStepContinue: () {
-            if (isLastStep) {
-              logger.d("In Firebase Query${steps().length-1 + currActiveStep}");
-
-              if (formKey.currentState!.validate()) {
-                logger.d("In Firebase Auth");
-                _firebaseAuth
-                    .createUserWithEmailAndPassword(
-                        email: email.text, password: password.text)
-                    .then((value) {
-                  final User? user = _firebaseAuth.currentUser;
-                  final userInfo = <String, String>{
-                    "email": email.text,
-                    "password": password.text,
-                    "staffID": staffId.text,
-                    "fName": fName.text,
-                    "lName": lName.text,
-                    "address": address.text,
-                    // "profilePic": ""
-                  };
-
-                  dBase
-                      .collection("User")
-                      .doc(user?.uid)
-                      .set(userInfo)
-                      .onError((error, stackrace) {
-                    logger.e("Error ${error.toString()}");
-                  });
-                }).then((value) {
-                  if (context.mounted) {
-                    Navigator.pushNamed(
-                        context, authRoute);
-                  }
-                }).onError((error, stackTrace) {
-                  logger.e("Error ${error.toString()}");
-                });
-              }
-            } else {
-              setState(() {
-                currActiveStep += 1;
-              });
-            }
-          },
-          onStepCancel: () {
-            //just go back to login page
-            isFirstStep
-                ? Navigator.pop(context)
-                : setState(() {
-                    currActiveStep -= 1;
-                  }); //step backing
-          },
-          onStepTapped: (int index) {
-            setState(() {
-              currActiveStep = index;
-            });
-          },
-          controlsBuilder: (context, details) => Padding(
-              padding: const EdgeInsets.all(4),
-              child: Row(
-                children: [
-                  Expanded(
-                      child: ElevatedButton(
-                    onPressed: details.onStepContinue,
-                    child: Text(isLastStep ? 'Proceed' : 'Next'),
-                  )),
-                  if (!isFirstStep) ...[
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: ElevatedButton(
-                        onPressed: details.onStepCancel,
-                        child: const Text('Back')),
-                  )
-                  ]
-                ],
-              )),
+        appBar: AppBar(
+          title: const Text("User Registration"),
         ),
-      ),
-    ));
+        body: Center(
+          child: Form(
+            key: formKey,
+            child: Stepper(
+              type: StepperType.vertical,
+              currentStep: currActiveStep,
+              steps: steps(),
+              onStepContinue: () {
+                if (isLastStep) {
+                  logger.d(
+                      "In Firebase Query${steps().length - 1 + currActiveStep}");
+
+                  if (formKey.currentState!.validate()) {
+                    logger.d("In Firebase Auth");
+                    _firebaseAuth
+                        .createUserWithEmailAndPassword(
+                            email: email.text, password: password.text)
+                        .then((value) {
+                      final User? user = _firebaseAuth.currentUser;
+                      final userInfo = <String, String>{
+                        "email": email.text,
+                        "password": password.text,
+                        "staffID": staffId.text,
+                        "fName": fName.text,
+                        "lName": lName.text,
+                        "address": address.text,
+                        // "profilePic": ""
+                      };
+
+                      dBase
+                          .collection("User")
+                          .doc(user?.uid)
+                          .set(userInfo)
+                          .onError((error, stackrace) {
+                        logger.e("Error ${error.toString()}");
+                      });
+                    }).then((value) {
+                      if (context.mounted) {
+                        Navigator.pushNamed(context, authRoute);
+                      }
+                    }).onError((error, stackTrace) {
+                      logger.e("Error ${error.toString()}");
+                    });
+                  }
+                } else {
+                  setState(() {
+                    currActiveStep += 1;
+                  });
+                }
+              },
+              onStepCancel: () {
+                //just go back to login page
+                isFirstStep
+                    ? Navigator.pop(context)
+                    : setState(() {
+                        currActiveStep -= 1;
+                      }); //step backing
+              },
+              onStepTapped: (int index) {
+                setState(() {
+                  currActiveStep = index;
+                });
+              },
+              controlsBuilder: (context, details) => Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: ElevatedButton(
+                        onPressed: details.onStepContinue,
+                        child: Text(isLastStep ? 'Proceed' : 'Next'),
+                      )),
+                      if (!isFirstStep) ...[
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                              onPressed: details.onStepCancel,
+                              child: const Text('Back')),
+                        )
+                      ]
+                    ],
+                  )),
+            ),
+          ),
+        ));
   }
 
   List<Step> steps() => [
@@ -186,8 +188,8 @@ class _RegisterPageState extends State<RegisterPage> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return "Please reenter your password.";
-                }  else if (value != password.text) {
-                    toastErrorPopUp(
+                } else if (value != password.text) {
+                  toastErrorPopUp(
                       "Confirm password is not the same as the password initially entered");
                   return "Confirm Password does not match with password";
                 }
@@ -278,42 +280,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ]),
         ),
-        // Step(
-        //   title: const Text('Upload Profile Photo'),
-        //   isActive: currActiveStep >= 2,
-        //   content: Column(children: <Widget>[
-        //     TextFormField(
-        //       // validator: (value) {
-        //       //   if (value == null || value.isEmpty) {
-        //       //     return "Please enter your first name.";
-        //       //   }
-        //       //   return null;
-        //       // },
-        //       controller: profilePic,
-        //       decoration: const InputDecoration(
-        //           hintText: "Optional Stuff",
-        //           focusedBorder: OutlineInputBorder(
-        //               borderSide: BorderSide(color: Colors.blue, width: 2.0)),
-        //           enabledBorder: OutlineInputBorder(
-        //               borderSide: BorderSide(color: Colors.black, width: 2.0))),
-        //     ),
-        //   ]),
-        // )
       ];
-
-  // bool isFormDetailComplete() {
-  //   if (currActiveStep == 0) {
-  //     if (email.text.isEmpty || password.text.isEmpty) {
-  //       return false;
-  //     }
-  //   } else if (currActiveStep == 1) {
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-
-  //   return false;
-  // }
 
   void toastErrorPopUp(String eMsg) {
     Fluttertoast.showToast(

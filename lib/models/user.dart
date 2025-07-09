@@ -31,12 +31,12 @@ int assignRole(staffID) {
     //I assume the staffID is related to their position
     String staffIDPrefix = staffID.substring(0, 4);
 
-    if (staffIDPrefix == "") {
+    if (staffIDPrefix == "HOA") {
       return 1; //HOAdmin
-    } else if (staffIDPrefix == "") {
+    } else if (staffIDPrefix == "ENT") {
       return 2; //Entomologist
-    } else if (staffIDPrefix == "") {
-      return 3; //PHA
+    } else if (staffIDPrefix == "OPT") {
+      return 3; //OT
     } else {
       return 0; //DengueCaseReporter
     }

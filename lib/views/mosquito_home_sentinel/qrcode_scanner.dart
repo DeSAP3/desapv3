@@ -1,6 +1,7 @@
-import 'package:desapv3/controllers/data_controller.dart';
-import 'package:desapv3/controllers/navigation_link.dart';
-import 'package:desapv3/controllers/route_generator.dart';
+import 'package:desapv3/viewmodels/cup_viewmodel.dart';
+import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
+import 'package:desapv3/viewmodels/navigation_link.dart';
+import 'package:desapv3/viewmodels/route_generator.dart';
 import 'package:desapv3/models/cup.dart';
 import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:desapv3/services/permissions_handling.dart';
@@ -29,7 +30,7 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataController>(context, listen: false);
+    final cupProvider = Provider.of<CupViewModel>(context, listen: false);
 
     return Scaffold(
       drawer: const AppDrawer(),
@@ -38,7 +39,7 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
       ),
       body: Center(
         child: FutureBuilder<List<Cup>>(
-          future: dataProvider.fetchCups(),
+          future: cupProvider.fetchCups(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -74,7 +75,7 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
                   try {
                     Cup? cupToEdit = cupList.firstWhere(
                         (cup) =>
-                            (cup.localityCaseID == oviTrapIDScanned) &&
+                            (cup.ovitrapID == oviTrapIDScanned) &&
                             cup.isActive,
                         orElse: () => Cup(
                             null, null, null, null, null, null, false, null));

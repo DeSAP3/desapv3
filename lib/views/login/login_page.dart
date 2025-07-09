@@ -1,5 +1,5 @@
-import "package:desapv3/controllers/navigation_link.dart";
-import "package:desapv3/controllers/user_controller.dart";
+import "package:desapv3/viewmodels/navigation_link.dart";
+import "package:desapv3/viewmodels/user_viewmodel.dart";
 import "package:desapv3/reuseable_widget/text_field_widget.dart";
 import "package:desapv3/services/firebase_auth_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                               controller: _email,
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return null;
+                                  return "Email Is Required";
                                 }
                                 return null;
                               }),
@@ -74,6 +74,12 @@ class _LoginPageState extends State<LoginPage> {
                               hintText: "Password",
                               prefixIcon: const Icon(Icons.password),
                               obscureText: isPasswordVisible,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Password Is Required";
+                                }
+                                return null;
+                              },
                               suffixIcon: IconButton(
                                   onPressed: () {
                                     setState(() {
@@ -118,16 +124,12 @@ class _LoginPageState extends State<LoginPage> {
                                       .signInWithEmailAndPassword(
                                           _email.text, _password.text);
 
-                                          print("Here: ${user}");
-
                                   if (user != null && user!.emailVerified) {
-                                    print("There: ${user}");
                                     if (context.mounted) {
-
-                                      await Provider.of<UserController>(context,
+                                      await Provider.of<UserViewModel>(context,
                                               listen: false)
-                                          .fetchUser(user!.uid);
-                                          
+                                          .fetchCurrentUser();
+
                                       if (mounted && context.mounted) {
                                         logger.d("Successfully logged in");
                                         Navigator.pushReplacementNamed(

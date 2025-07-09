@@ -1,4 +1,5 @@
-import 'package:desapv3/controllers/data_controller.dart';
+import 'package:desapv3/viewmodels/cup_viewmodel.dart';
+import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
 import 'package:desapv3/models/circle_map_data.dart';
 import 'package:desapv3/models/cup.dart';
 import 'package:desapv3/reuseable_widget/app_drawer.dart';
@@ -24,7 +25,7 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
   void initState() {
     super.initState();
     _fetchCupsFuture =
-        Provider.of<DataController>(context, listen: false).fetchCups();
+        Provider.of<CupViewModel>(context, listen: false).fetchCups();
   }
 
   final MapController _mapControls = MapController();
@@ -63,7 +64,7 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                   onTap: () {
                     logger.d(active);
                     setState(() {
-                      active = active == "heatMap" ? "none" : "heatMap";
+                      active = "none";
                     });
                     Future.microtask(() {
                       showDialog(
@@ -78,6 +79,9 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                                   child: const Text("200m"),
                                   onPressed: () {
                                     heatMapRadius = 200;
+                                    setState(() {
+                                      active = "heatMap";
+                                    });
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -85,13 +89,18 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                                   child: const Text("400m"),
                                   onPressed: () {
                                     heatMapRadius = 400;
-
+                                    setState(() {
+                                      active = "heatMap";
+                                    });
                                     Navigator.of(context).pop();
                                   },
                                 ),
                                 TextButton(
                                   child: const Text("Cancel"),
                                   onPressed: () {
+                                    setState(() {
+                                      active = "none";
+                                    });
                                     Navigator.of(context).pop();
                                   },
                                 )
@@ -115,6 +124,21 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                           : "breedingSiteCalc";
                     });
                   }),
+              SpeedDialChild(
+                  elevation: 0,
+                  child: const Icon(
+                    Icons.circle_rounded,
+                    color: Colors.blue,
+                  ),
+                  labelWidget: const Text("Generate Outbreak Prediction"),
+                  backgroundColor: Colors.white70,
+                  onTap: () {
+                    setState(() {
+                      active = active == "genOutbreakPredict"
+                          ? "none"
+                          : "genOutbreakPredict";
+                    });
+                  }),
             ],
             child: const Icon(Icons.more, color: Colors.white)),
         body: FutureBuilder(
@@ -126,9 +150,9 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                 return Center(child: Text('${snapshot.error}'));
               }
 
-              final dataProvider = Provider.of<DataController>(context);
+              final cupProvider = Provider.of<CupViewModel>(context);
 
-              final cups = dataProvider.cupList
+              final cups = cupProvider.cupList
                   .where((cup) => cup.isActive == true)
                   .toList();
 
@@ -160,6 +184,8 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                 cupCoordinates.add(LatLng(c.gpsX!, c.gpsY!));
                 cupLocations.add(WeightedLatLng(LatLng(c.gpsX!, c.gpsY!), 1));
               }
+
+              final LayerHitNotifier<String> hitNotifier = ValueNotifier(null);
 
               return Stack(
                 children: [
@@ -199,6 +225,44 @@ class _MosquitoHomePageState extends State<MosquitoHomePage> {
                                         const Color.fromARGB(190, 219, 33, 33),
                                   ))
                               .toList(),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            final result = hitNotifier.value;
+                            if (result == null || result.hitValues.isEmpty)
+                              return;
+
+                            final tappedZone = result.hitValues.first;
+                            showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                title: const Text("Outbreak Prediction Info"),
+                                content: Text(
+                                    "Latitude: 1.5619\nLongtitude: 103.6363\nDate Creation: 2025-6-25\nHumidity: 74%\nMax Temp: 35 Celsuis\nMin Temp: 26 Celsuis\nPredicted Egg Count: 134\nPredicted Egg Count in next three months: 532"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: const Text("Close"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          child: PolygonLayer<String>(
+                            hitNotifier: hitNotifier,
+                            polygons: centroids
+                                .where((cenCentroid) =>
+                                    active == "genOutbreakPredict")
+                                .map((cenCentroid) => Polygon(
+                                    points: mapDataGen.generateCirclePolygon(
+                                        cenCentroid, heatMapRadius),
+                                    color:
+                                        const Color.fromARGB(190, 219, 33, 33),
+                                    hitValue:
+                                        "${cenCentroid.latitude},${cenCentroid.longitude}"))
+                                .toList(),
+                          ),
                         ),
                       ])
                 ],

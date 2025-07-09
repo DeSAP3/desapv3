@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_picker/date_time_picker.dart';
-import 'package:desapv3/controllers/dengue_case_controller.dart';
+import 'package:desapv3/viewmodels/dengue_case_viewmodel.dart';
 import 'package:desapv3/services/location_map_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -41,7 +41,7 @@ class _AddDengueCaseState extends State<AddDengueCase> {
   @override
   Widget build(BuildContext context) {
     final dengueCaseProvider =
-        Provider.of<DengueCaseController>(context, listen: false);
+        Provider.of<DengueCaseViewModel>(context, listen: false);
 
     return Scaffold(
         appBar: AppBar(
@@ -60,50 +60,58 @@ class _AddDengueCaseState extends State<AddDengueCase> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: _patientName,
-                  decoration: const InputDecoration(hintText: "Patient Name"),
-                ),
+                    controller: _patientName,
+                    decoration: const InputDecoration(
+                        hintText: "Patient Name", labelText: "Patient Name"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Patient Name Is Required";
+                      }
+                      return null;
+                    }),
               ),
               const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: _patientAge,
-                  decoration: const InputDecoration(hintText: "Patient Age"),
-                ),
+                    controller: _patientAge,
+                    decoration: const InputDecoration(
+                        hintText: "Patient Age", labelText: "Patient Age"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Patient Age Is Required";
+                      }
+                      return null;
+                    }),
               ),
               const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: _address,
-                  decoration: const InputDecoration(hintText: "Address"),
-                ),
+                    controller: _address,
+                    decoration: const InputDecoration(
+                        hintText: "Address", labelText: "Address"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Address Is Required";
+                      }
+                      return null;
+                    }),
               ),
               const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
-                  controller: _officerName,
-                  decoration: const InputDecoration(hintText: "Officer Name"),
-                ),
+                    controller: _officerName,
+                    decoration: const InputDecoration(
+                        hintText: "Officer Name", labelText: "Officer Name"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Officer Name Is Required";
+                      }
+                      return null;
+                    }),
               ),
-              // Flexible(
-              //     child: DropdownButtonFormField<String>(
-              //         value: selectedStatus,
-              //         decoration: const InputDecoration(hintText: "Status"),
-              //         items: statusOptions.map((String value) {
-              //           return DropdownMenuItem<String>(
-              //             value: value,
-              //             child: Text(value),
-              //           );
-              //         }).toList(),
-              //         onChanged: (String? newValue) {
-              //           setState(() {
-              //             selectedStatus = newValue;
-              //           });
-              //         })),
-
               const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -122,8 +130,10 @@ class _AddDengueCaseState extends State<AddDengueCase> {
 
                     logger.d(_dateRPDate);
                   })),
-                  validator: (val) {
-                    logger.d(val);
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Creation Date Is Required";
+                    }
                     return null;
                   },
                   onSaved: (val) => logger.d(val),
@@ -136,14 +146,14 @@ class _AddDengueCaseState extends State<AddDengueCase> {
                 children: [
                   Flexible(
                     child: Text(
-                      "Coordinate X: ${currentDCLocation?.latitude?.toStringAsFixed(6) ?? 'N/A'}",
+                      "Coordinate X: ${currentDCLocation?.latitude.toStringAsFixed(6) ?? 'N/A'}",
                       textAlign: TextAlign.center,
                     ),
                   ),
                   const SizedBox(width: 20), // spacing between X and Y
                   Flexible(
                     child: Text(
-                      "Coordinate Y: ${currentDCLocation?.longitude?.toStringAsFixed(6) ?? 'N/A'}",
+                      "Coordinate Y: ${currentDCLocation?.longitude.toStringAsFixed(6) ?? 'N/A'}",
                       textAlign: TextAlign.center,
                     ),
                   ),

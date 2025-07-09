@@ -1,12 +1,13 @@
-import "package:desapv3/controllers/data_controller.dart";
-import "package:desapv3/controllers/dengue_case_controller.dart";
-import "package:desapv3/controllers/navigation_link.dart";
-import "package:desapv3/controllers/user_controller.dart";
+import "package:desapv3/viewmodels/cup_viewmodel.dart";
+import "package:desapv3/viewmodels/ovitrap_viewmodel.dart";
+import "package:desapv3/viewmodels/dengue_case_viewmodel.dart";
+import "package:desapv3/viewmodels/navigation_link.dart";
+import "package:desapv3/viewmodels/user_viewmodel.dart";
 import "package:desapv3/firebase_options.dart";
 import "package:desapv3/reuseable_widget/app_input_theme.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
-import "controllers/route_generator.dart";
+import "viewmodels/route_generator.dart";
 import "package:firebase_core/firebase_core.dart";
 
 Future<void> main() async {
@@ -19,9 +20,10 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => DataController()),
-        ChangeNotifierProvider(create: (_) => DengueCaseController()),
-        ChangeNotifierProvider(create: (_) => UserController()),
+        ChangeNotifierProvider(create: (_) => OvitrapViewModel()),
+        ChangeNotifierProvider(create: (_) => CupViewModel()),
+        ChangeNotifierProvider(create: (_) => DengueCaseViewModel()),
+        ChangeNotifierProvider(create: (_) => UserViewModel()),
       ],
       child: const MyApp(),
     ),
@@ -36,9 +38,18 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "DeSAP",
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        inputDecorationTheme: AppInputTheme().theme()
-      ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color.fromARGB(255, 0, 93, 136),
+            foregroundColor: Colors.white, // text and icon color
+            centerTitle: true,
+            titleTextStyle: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          primarySwatch: Colors.blue,
+          inputDecorationTheme: AppInputTheme().theme()),
       initialRoute: authRoute,
       onGenerateRoute: generateRoute,
     );

@@ -4,23 +4,23 @@ import 'package:desapv3/reuseable_widget/string_extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
-class DengueCaseController with ChangeNotifier {
+class DengueCaseViewModel with ChangeNotifier {
   final List<DengueCase> _dengueCaseList = [];
-  bool get isLoading => _isFetchingDengueCase;
 
-  bool _isFetchingDengueCase = false;
+  bool _isFetchingDengueCase = false; //Is a fetching on progress
 
-  bool get isDengueCaseLoaded => _dengueCaseList.isNotEmpty;
+  bool get isFetchingDengueCase =>
+      _isFetchingDengueCase; //Technically is the dengue case loading
 
-  List<DengueCase> get dengueCaseList => _dengueCaseList;
+  bool get isDengueCaseLoaded => _dengueCaseList.isNotEmpty; //Does the list have items?
 
-  bool get isFetchingDengueCase => _isFetchingDengueCase;
+  List<DengueCase> get dengueCaseList => _dengueCaseList; //Return the dengue case list
 
   FirebaseFirestore dBaseRef = FirebaseFirestore.instance;
 
   final logger = Logger();
 
-  //Creators
+  //Dengue Case Creator
   Future<void> addDengueCase(
       String patientName,
       int patientAge,
@@ -86,8 +86,6 @@ class DengueCaseController with ChangeNotifier {
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>; //toJson
 
-        logger.d(data);
-
         DengueCase dc = DengueCase(
           doc.id,
           data['patientName'] ?? '',
@@ -108,7 +106,6 @@ class DengueCaseController with ChangeNotifier {
         _dengueCaseList.add(dc);
         logger.d(dc);
       }
-
     } on FirebaseException catch (e) {
       logger.e(e.message);
       rethrow;
@@ -120,7 +117,7 @@ class DengueCaseController with ChangeNotifier {
     return _dengueCaseList;
   }
 
-  //Updater
+  //Dengue Case Updater
   Future<void> updateDengueCase(DengueCase newDengueCase, int index) async {
     try {
       // Update in Firestore
@@ -166,13 +163,13 @@ class DengueCaseController with ChangeNotifier {
       _dengueCaseList.update(index, newDengueCase);
       notifyListeners();
     } catch (e) {
-      logger.e('Error adding Ovitrap: ${e.toString()}');
+      logger.e('Error Updating Dengue Case Status: ${e.toString()}');
     }
   }
 
   Future<void> deleteDengueCase(DengueCase delDC) async {
     await dBaseRef.collection('DengueCase').doc(delDC.dCaseID).delete().then(
-        (doc) => logger.d("Document deleted"),
+        (doc) => logger.d("Ovitrap deleted"),
         onError: (e) => logger.e("Error deleting document: $e"));
 
     _dengueCaseList.remove(delDC);

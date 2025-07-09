@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:desapv3/controllers/data_controller.dart';
-import 'package:desapv3/controllers/navigation_link.dart';
+import 'package:desapv3/viewmodels/cup_viewmodel.dart';
+import 'package:desapv3/viewmodels/navigation_link.dart';
 import 'package:desapv3/models/cup.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -37,7 +37,7 @@ class _EditCupPageState extends State<EditCupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataController>(context, listen: false);
+    final cupProvider = Provider.of<CupViewModel>(context, listen: false);
 
     return Scaffold(
         appBar: AppBar(
@@ -58,7 +58,6 @@ class _EditCupPageState extends State<EditCupPage> {
                   keyboardType: TextInputType.number,
                 ),
               ),
-              const SizedBox(height: 10),
               Row(children: [
                 Flexible(
                   child: Padding(
@@ -111,7 +110,7 @@ class _EditCupPageState extends State<EditCupPage> {
               const SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () {
-                    dataProvider.updateCup(Cup(
+                    cupProvider.updateCup(Cup(
                         currentCupInEdit.cupID,
                         int.parse(_eggCount.text),
                         0,
@@ -119,9 +118,9 @@ class _EditCupPageState extends State<EditCupPage> {
                         int.parse(_larvaeCount.text),
                         _status.text,
                         currentCupInEdit.isActive,
-                        currentCupInEdit.localityCaseID));
+                        currentCupInEdit.ovitrapID));
                     logger.d(const Text("Updating Cup in Firebase"));
-                    Navigator.popAndPushNamed(context, sentinelInfoRoute, arguments: currentCupInEdit.localityCaseID);
+                    Navigator.popAndPushNamed(context, sentinelInfoRoute, arguments: currentCupInEdit.ovitrapID);
                   },
                   child: const Text("Update Cup"))
             ],

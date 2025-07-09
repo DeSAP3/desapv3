@@ -1,4 +1,4 @@
-import 'package:desapv3/controllers/navigation_link.dart';
+import 'package:desapv3/viewmodels/navigation_link.dart';
 import 'package:flutter/material.dart';
 
 class ErrorPage extends StatelessWidget {

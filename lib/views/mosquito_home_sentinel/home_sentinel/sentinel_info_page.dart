@@ -1,14 +1,14 @@
-import 'package:desapv3/controllers/navigation_link.dart';
-import 'package:desapv3/controllers/route_generator.dart';
+import 'package:desapv3/viewmodels/cup_viewmodel.dart';
+import 'package:desapv3/viewmodels/navigation_link.dart';
+import 'package:desapv3/viewmodels/route_generator.dart';
 import 'package:flutter/material.dart';
-import 'package:desapv3/controllers/data_controller.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class SentinelInfoPage extends StatefulWidget {
-  final String localityCaseID;
-  const SentinelInfoPage(this.localityCaseID, {super.key});
+  final String ovitrapID;
+  const SentinelInfoPage(this.ovitrapID, {super.key});
 
   @override
   State<SentinelInfoPage> createState() => _SentinelInfoPageState();
@@ -16,20 +16,26 @@ class SentinelInfoPage extends StatefulWidget {
 
 class _SentinelInfoPageState extends State<SentinelInfoPage> {
   final logger = Logger();
-  late String currentLocalityCaseID;
+  late String currentOvitrapID;
 
   @override
   initState() {
     super.initState();
-    currentLocalityCaseID = widget.localityCaseID;
-    logger.d(currentLocalityCaseID);
+    currentOvitrapID = widget.ovitrapID;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<CupViewModel>(context, listen: false).fetchCups();
+    });
+    logger.d(currentOvitrapID);
   }
 
   String active = "none";
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataController>(context, listen: false);
+    final cupProvider = Provider.of<CupViewModel>(context);
+    final cups = cupProvider.cupList
+        .where((cup) => cup.ovitrapID == currentOvitrapID)
+        .toList();
     return Scaffold(
         floatingActionButton: SpeedDial(
           activeIcon: Icons.close,
@@ -47,7 +53,7 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
                 backgroundColor: Colors.white70,
                 onTap: () {
                   Navigator.pushNamed(context, addCupRoute,
-                      arguments: currentLocalityCaseID);
+                      arguments: currentOvitrapID);
                 }),
             SpeedDialChild(
                 elevation: 0,
@@ -91,64 +97,52 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
           ],
           child: const Icon(Icons.more, color: Colors.white),
         ),
-        appBar: AppBar(),
-        body: Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 25, child: Text("Sentinel Info")),
-              Flexible(
-                child: FutureBuilder(
-                  future: dataProvider.fetchCups(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('${snapshot.error}'));
-                    }
-                    final cups = dataProvider.cupList
-                        .where((cup) =>
-                            cup.localityCaseID == currentLocalityCaseID)
-                        .toList();
-
-                    return ListView.builder(
+        appBar: AppBar(title: const Text("Sentinel Information")),
+        body: cupProvider.isFetchingCups
+            ? const Center(child: CircularProgressIndicator())
+            : cupProvider.cupList.isEmpty
+                ? const Center(child: Text('No Cup Entry Found'))
+                : Center(
+                    child: ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: cups.length,
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            leading: active != 'none'
-                                ? IconButton(
-                                    onPressed: () {
-                                      if (active == 'edit') {
-                                        Navigator.pushNamed(
-                                          context,
-                                          editCupRoute,
-                                          arguments:
-                                              EditCupArguments(cups[index]),
-                                        );
-                                      } else if (active == 'delete') {
-                                        dataProvider.deleteCup(cups[index]);
-                                      } else if (active == 'activate') {
-                                        logger.d("In Activation");
-                                        dataProvider.updateCupActivity(
-                                            currentLocalityCaseID, cups[index]);
-                                      }
-                                    },
-                                    icon: Icon(functionIcon(active)),
-                                    tooltip: "Edit",
-                                  )
-                                : null,
-                            title: Text(cups[index].cupID!),
-                            subtitle: Text(
-                              "Mosquito Egg Count: ${cups[index].eggCount}\nCoordinate X: ${cups[index].gpsX}\t\t\t\t\tCoordinate Y: ${cups[index].gpsY}\nLarvae Count: ${cups[index].larvaeCount}\t\t\tIn Use: ${cups[index].isActive ? 'Yes' : 'No'}\nCup Status: ${cups[index].status}",
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 8),
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            child: ListTile(
+                              leading: active != 'none'
+                                  ? IconButton(
+                                      onPressed: () {
+                                        if (active == 'edit') {
+                                          Navigator.pushNamed(
+                                            context,
+                                            editCupRoute,
+                                            arguments:
+                                                EditCupArguments(cups[index]),
+                                          );
+                                        } else if (active == 'delete') {
+                                          cupProvider.deleteCup(cups[index]);
+                                        } else if (active == 'activate') {
+                                          logger.d("In Activation");
+                                          cupProvider.updateCupActivity(
+                                              currentOvitrapID, cups[index]);
+                                        }
+                                      },
+                                      icon: Icon(functionIcon(active)),
+                                      tooltip: "Edit",
+                                    )
+                                  : null,
+                              title: Text(cups[index].cupID!),
+                              subtitle: Text(
+                                "Mosquito Egg Count: ${cups[index].eggCount}\nCoordinate X: ${cups[index].gpsX}\t\t\t\t\tCoordinate Y: ${cups[index].gpsY}\nLarvae Count: ${cups[index].larvaeCount}\t\t\tIn Use: ${cups[index].isActive ? 'Yes' : 'No'}\nCup Status: ${cups[index].status}",
+                              ),
                             ),
                           );
-                        });
-                  },
-                ),
-              )
-            ],
-          ),
-        ));
+                        })));
   }
 
   IconData functionIcon(String active) {

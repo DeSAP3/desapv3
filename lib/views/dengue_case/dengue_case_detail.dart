@@ -1,5 +1,5 @@
-import 'package:desapv3/controllers/dengue_case_controller.dart';
-import 'package:desapv3/controllers/user_controller.dart';
+import 'package:desapv3/viewmodels/dengue_case_viewmodel.dart';
+import 'package:desapv3/viewmodels/user_viewmodel.dart';
 import 'package:desapv3/models/dengue_case.dart';
 import 'package:desapv3/reuseable_widget/dengue_case_card.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +28,8 @@ class _DengueCaseDetailState extends State<DengueCaseDetail> {
   @override
   Widget build(BuildContext context) {
     final dengueCaseProvider =
-        Provider.of<DengueCaseController>(context, listen: false);
-    final currentUser = Provider.of<UserController>(context, listen: false).user;
+        Provider.of<DengueCaseViewModel>(context, listen: false);
+    final currentUser = Provider.of<UserViewModel>(context, listen: false).user;
     logger.d(currentUser?.role);
 
     DateTime dateRPDate = DateTime.fromMillisecondsSinceEpoch(

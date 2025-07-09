@@ -1,8 +1,8 @@
-import 'package:desapv3/controllers/navigation_link.dart';
-import 'package:desapv3/controllers/route_generator.dart';
+import 'package:desapv3/viewmodels/navigation_link.dart';
+import 'package:desapv3/viewmodels/route_generator.dart';
 import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:desapv3/controllers/data_controller.dart';
+import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
@@ -17,10 +17,20 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
   String active = "none";
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<OvitrapViewModel>(context, listen: false).fetchOviTrap();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataController>(context, listen: false);
+    final ovitrapProvider =
+        Provider.of<OvitrapViewModel>(context);
+    final oviTraps = ovitrapProvider.oviTrapList;
     return Scaffold(
-      drawer: const AppDrawer(),
+        drawer: const AppDrawer(),
         floatingActionButton: SpeedDial(
             activeIcon: Icons.close,
             iconTheme: const IconThemeData(color: Colors.white),
@@ -80,22 +90,12 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
             ],
             child: const Icon(Icons.more, color: Colors.white)), //Button Menu
         appBar: AppBar(title: const Text("Mosquito Home Sentinel")),
-        body: Center(
-          child: Column(
-            children: [
-              Flexible(
-                child: FutureBuilder(
-                  future: dataProvider.fetchOviTrap(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('${snapshot.error}'));
-                    }
-
-                    final oviTraps = dataProvider.oviTrapList;
-
-                    return ListView.builder(
+        body: ovitrapProvider.isFetchingOviTrap
+            ? const Center(child: CircularProgressIndicator())
+            : ovitrapProvider.oviTrapList.isEmpty
+                ? const Center(child: Text('No Ovitrap Entry Found'))
+                : Center(
+                    child: ListView.builder(
                         padding: const EdgeInsets.all(16),
                         itemCount: oviTraps.length,
                         itemBuilder: (context, index) {
@@ -111,48 +111,61 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                                       .millisecondsSinceEpoch);
                           return GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(context, sentinelInfoRoute,
+                              Navigator.pushNamed(
+                                  context, sentinelInfoRoute,
                                   arguments: oviTraps[index].oviTrapID);
                             },
-                            child: ListTile(
-                              leading: active != 'none'
-                                  ? IconButton(
-                                      onPressed: () {
-                                        if (active == 'edit') {
-                                          Navigator.pushNamed(
-                                            context,
-                                            editOvitrapRoute,
-                                            arguments: EditOvitrapArguments(
-                                                oviTraps[index], index),
-                                          );
-                                        } else if (active == 'delete') {
-                                          dataProvider
-                                              .deleteOviTrap(oviTraps[index]);
-                                        } else if (active == 'generateQR') {
-                                          Navigator.pushNamed(
-                                            context,
-                                          qrCodeGeneratorRoute,
-                                            arguments: QrCodeGenArguments(
-                                                oviTraps[index].oviTrapID),
-                                          );
-                                        }
-                                      },
-                                      icon: Icon(functionIcon(active)))
-                                  : null,
-                              title: Text(oviTraps[index].location!),
-                              subtitle: Text(
-                                "Member: ${oviTraps[index].member}\t\t\t\t\tStatus: ${oviTraps[index].status}\nEpid Week Inst: ${oviTraps[index].epiWeekInstl}\t\t\t\t\tEpid Week Rmv: ${oviTraps[index].epiWeekRmv}\nInst Time: $instlTimeDisplay\nRmv Time: $removeTimeDisplay",
+                            child: Card(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 8),
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(12)),
+                              child: ListTile(
+                                leading: active != 'none'
+                                    ? IconButton(
+                                        onPressed: () {
+                                          if (active == 'edit') {
+                                            Navigator.pushNamed(
+                                              context,
+                                              editOvitrapRoute,
+                                              arguments:
+                                                  EditOvitrapArguments(
+                                                      oviTraps[index],
+                                                      index),
+                                            );
+                                          } else if (active ==
+                                              'delete') {
+                                            ovitrapProvider
+                                                .deleteOviTrap(
+                                                    oviTraps[index]);
+                                          } else if (active ==
+                                              'generateQR') {
+                                            Navigator.pushNamed(
+                                              context,
+                                              qrCodeGeneratorRoute,
+                                              arguments:
+                                                  QrCodeGenArguments(
+                                                      oviTraps[index]
+                                                          .oviTrapID),
+                                            );
+                                          }
+                                        },
+                                        icon:
+                                            Icon(functionIcon(active)))
+                                    : null,
+                                title: Text(oviTraps[index].location!),
+                                subtitle: Text(
+                                  "Member: ${oviTraps[index].member}\t\t\t\t\tStatus: ${oviTraps[index].status}\nEpid Week Inst: ${oviTraps[index].epiWeekInstl}\t\t\t\t\tEpid Week Rmv: ${oviTraps[index].epiWeekRmv}\nInst Time: $instlTimeDisplay\nRmv Time: $removeTimeDisplay",
+                                ),
+                                trailing:
+                                    const Icon(Icons.arrow_forward_ios),
                               ),
-                              trailing: const Icon(Icons.arrow_forward_ios),
-                            ),
+                            ), //
                           );
-                        });
-                  },
-                ),
-              )
-            ],
-          ),
-        ));
+                        }),
+                  ));
   }
 
   IconData functionIcon(String active) {

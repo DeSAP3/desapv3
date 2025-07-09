@@ -1,5 +1,5 @@
-import 'package:desapv3/controllers/navigation_link.dart';
-import 'package:desapv3/controllers/user_controller.dart';
+import 'package:desapv3/viewmodels/navigation_link.dart';
+import 'package:desapv3/viewmodels/user_viewmodel.dart';
 import 'package:desapv3/views/historical_map/mosquito_home_map_page.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -10,17 +10,22 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Logger logger = Logger();
-    final loggedInUser = Provider.of<UserController>(context).user;
+    Logger logger = Logger();
+    final userProvider = Provider.of<UserViewModel>(context, listen: true);
+    userProvider.fetchCurrentUser();
+    final userName = userProvider.user;
+    
+
     return Drawer(
       child: ListView(
         padding: const EdgeInsets.all(8),
         children: [
-          const DrawerHeader(
-              child: Text('Menu', style: TextStyle(color: Colors.black))),
+          DrawerHeader(
+              child: Text('Hello ${userProvider.getRole(userName!.role!)} ${userName.fName}',
+                  style: const TextStyle(color: Colors.black))),
           ListTile(
             leading: const Icon(Icons.home),
-            title: const Text('Home'),
+            title: const Text('Dashboard'),
             onTap: () {
               Navigator.pushReplacementNamed(context, homeRoute);
             },
