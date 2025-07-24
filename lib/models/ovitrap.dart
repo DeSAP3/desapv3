@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:desapv3/models/cup.dart';
-
+//This model contains the information required for the Ovitrap class
 class OviTrap {
   String oviTrapID;
   String? location;
@@ -10,8 +9,7 @@ class OviTrap {
   int? epiWeekRmv;
   Timestamp? instlTime;
   Timestamp? removeTime;
-  List<Cup>? cupList;
-
+  String? dengueCaseID;
 
   OviTrap(
       this.oviTrapID,
@@ -22,7 +20,7 @@ class OviTrap {
       this.epiWeekRmv,
       this.instlTime,
       this.removeTime,
-      this.cupList);
+      this.dengueCaseID);
 
   factory OviTrap.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -30,15 +28,13 @@ class OviTrap {
     final location = data['location'] ?? '';
     final member = data['member'] ?? '';
     final status = data['status'] ?? '';
-    // final epiWeekInstl = int.tryParse(data['epiWeekInstl'] ?? '0') ?? 0;
-    // final epiWeekRmv = int.tryParse(data['epiWeekRmv'] ?? '0') ?? 0;
     final epiWeekInstl = data['epiWeekInstl'] ?? 0;
     final epiWeekRmv = data['epiWeekRmv'] ?? 0;
     final instlTime = (data['instlTime'] as Timestamp?) ?? Timestamp.now();
     final removeTime = (data['removeTime'] as Timestamp?) ?? Timestamp.now();
-    final cupList = data['cupList'] is Iterable ? List.from(data['cupList']):[];
+    final dengueCaseID = (data['dengueCaseID']) ?? '';
 
     return OviTrap(oviTrapID, location, member, status, epiWeekInstl,
-        epiWeekRmv, instlTime, removeTime, cupList.cast<Cup>());
+        epiWeekRmv, instlTime, removeTime, dengueCaseID);
   }
 }

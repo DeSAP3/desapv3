@@ -119,7 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       Expanded(
                           child: ElevatedButton(
                         onPressed: details.onStepContinue,
-                        child: Text(isLastStep ? 'Proceed' : 'Next'),
+                        child: Text(isLastStep ? 'Register' : 'Next'),
                       )),
                       if (!isFirstStep) ...[
                         const SizedBox(width: 10),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:date_time_picker/date_time_picker.dart';
@@ -28,6 +29,8 @@ class _AddOvitrapPageState extends State<AddOvitrapPage> {
 
   late final Timestamp _instlTime = Timestamp.fromDate(_instlDateTime);
   late final Timestamp _removeTime = Timestamp.fromDate(_removeDateTime);
+
+  late final String dengueCaseID; //
 
   @override
   Widget build(BuildContext context) {
@@ -225,9 +228,10 @@ class _AddOvitrapPageState extends State<AddOvitrapPage> {
                             int.parse(_epiWeekInstl.text),
                             int.parse(_epiWeekRmv.text),
                             _instlTime,
-                            _removeTime);
+                            _removeTime,
+                            dengueCaseID);
                         logger.d(const Text("Adding to Firebase"));
-                        Navigator.pop(context);
+                        context.pop();
                       }
                     },
                     child: const Text("Add Ovitrap"))

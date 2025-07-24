@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+//This model contains the information required for the Dengue Case class
 class DengueCase {
   String? dCaseID;
   String? patientName;

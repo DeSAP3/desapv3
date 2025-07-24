@@ -1,7 +1,7 @@
+import "package:desapv3/services/auth_gate.dart";
 import "package:desapv3/viewmodels/navigation_link.dart";
 import "package:desapv3/viewmodels/user_viewmodel.dart";
 import "package:desapv3/reuseable_widget/text_field_widget.dart";
-import "package:desapv3/services/firebase_auth_service.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/gestures.dart";
 import "package:flutter/material.dart";
@@ -21,8 +21,6 @@ class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
 
-  final loginService = FirebaseAuthService();
-
   bool isPasswordVisible = true;
   User? user;
 
@@ -38,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    final loginService = Provider.of<UserViewModel>(context, listen: false); //
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -120,23 +119,25 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               onPressed: () async {
                                 try {
+                                  logger.d(_email.text);
                                   user = await loginService
                                       .signInWithEmailAndPassword(
                                           _email.text, _password.text);
+                                          
 
-                                  if (user != null && user!.emailVerified) {
-                                    if (context.mounted) {
-                                      await Provider.of<UserViewModel>(context,
-                                              listen: false)
-                                          .fetchCurrentUser();
+                                  // if (user != null && user!.emailVerified) {
+                                  //   if (context.mounted) {
+                                  //     await Provider.of<UserViewModel>(context,
+                                  //             listen: false)
+                                  //         .fetchCurrentUser();
 
-                                      if (mounted && context.mounted) {
-                                        logger.d("Successfully logged in");
-                                        Navigator.pushReplacementNamed(
-                                            context, homeRoute);
-                                      }
-                                    }
-                                  }
+                                  //     if (mounted && context.mounted) {
+                                  //       logger.d("Successfully logged in");
+                                  //       Navigator.pushReplacementNamed(
+                                  //           context, homeRoute);
+                                  //     }
+                                  //   }
+                                  // }
                                 } on Exception catch (e) {
                                   logger.e("Error signing in: $e");
                                 } catch (e) {

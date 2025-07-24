@@ -1,3 +1,4 @@
+import 'package:desapv3/routing/router_path.dart';
 import 'package:desapv3/viewmodels/cup_viewmodel.dart';
 import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
 import 'package:desapv3/viewmodels/navigation_link.dart';
@@ -6,6 +7,7 @@ import 'package:desapv3/models/cup.dart';
 import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:desapv3/services/permissions_handling.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -75,15 +77,14 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
                   try {
                     Cup? cupToEdit = cupList.firstWhere(
                         (cup) =>
-                            (cup.ovitrapID == oviTrapIDScanned) &&
-                            cup.isActive,
+                            (cup.ovitrapID == oviTrapIDScanned) && cup.isActive,
                         orElse: () => Cup(
                             null, null, null, null, null, null, false, null));
-                    //Trying to fiter out the cupList associated to Ovitrap, then Navigator.pushReplacementNamed(context, sentinelInfoRoute, arguments: oviTrapIDScanned)
+                    //Trying to filter out the cupList associated to the selected Ovitrap
 
                     if (cupToEdit.cupID != null) {
-                      await Navigator.pushNamed(context, editCupRoute,
-                          arguments: EditCupArguments(cupToEdit));
+                      context.push('/editCup',
+                          extra: EditCupArguments(cupToEdit));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -92,8 +93,7 @@ class _QrcodeScannerState extends State<QrcodeScanner> {
                           action: SnackBarAction(
                               label: 'Edit',
                               onPressed: () {
-                                Navigator.pushNamed(context, sentinelInfoRoute,
-                                    arguments: oviTrapIDScanned!);
+                                context.push('/sentinelInfo', extra: SentinelInfoArgument(oviTrapIDScanned!));
                               }),
                         ),
                       );

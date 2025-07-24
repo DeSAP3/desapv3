@@ -61,6 +61,8 @@ dependencies:
   flutter_map_geojson: ^1.0.8
   weatherapi: ^1.1.1
   fl_chart: ^0.71.0
+  firebase_app_check: ^0.3.2+9
+  go_router: ^16.0.0
 
 dev_dependencies:
   flutter_test:

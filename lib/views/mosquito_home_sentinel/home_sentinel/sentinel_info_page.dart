@@ -1,7 +1,9 @@
+import 'package:desapv3/routing/router_path.dart';
 import 'package:desapv3/viewmodels/cup_viewmodel.dart';
 import 'package:desapv3/viewmodels/navigation_link.dart';
 import 'package:desapv3/viewmodels/route_generator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -52,8 +54,8 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
                 labelWidget: const Text("Add Cup"),
                 backgroundColor: Colors.white70,
                 onTap: () {
-                  Navigator.pushNamed(context, addCupRoute,
-                      arguments: currentOvitrapID);
+                  context.push('/addCup',
+                      extra: AddCupArguments(currentOvitrapID));
                 }),
             SpeedDialChild(
                 elevation: 0,
@@ -118,12 +120,7 @@ class _SentinelInfoPageState extends State<SentinelInfoPage> {
                                   ? IconButton(
                                       onPressed: () {
                                         if (active == 'edit') {
-                                          Navigator.pushNamed(
-                                            context,
-                                            editCupRoute,
-                                            arguments:
-                                                EditCupArguments(cups[index]),
-                                          );
+                                          context.push('/editCup', extra: EditCupArguments(cups[index]));
                                         } else if (active == 'delete') {
                                           cupProvider.deleteCup(cups[index]);
                                         } else if (active == 'activate') {

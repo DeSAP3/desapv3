@@ -5,6 +5,7 @@ import 'package:desapv3/services/location_map_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
@@ -19,19 +20,14 @@ class AddCupPage extends StatefulWidget {
 class _AddCupPageState extends State<AddCupPage> {
   final formKey = GlobalKey<FormState>();
   final logger = Logger();
-  LocationServices locationService = LocationServices();
 
-  final _eggCount = TextEditingController();
-  final _larvaeCount = TextEditingController();
+  final _eggCount = TextEditingController(text: '0');
+  final _larvaeCount = TextEditingController(text: '0');
   final _status = TextEditingController();
 
   late String currentOvitrapID;
 
-  Position? currentCupLocation;
-  Placemark? currentPreciseCupLocation;
 
-  late double coordX = 0.0;
-  late double coordY = 0.0;
 
   @override
   void initState() {
@@ -49,8 +45,8 @@ class _AddCupPageState extends State<AddCupPage> {
         ),
         floatingActionButton: FloatingActionButton(
             child: const Icon(Icons.my_location_outlined),
-            onPressed: () {
-              setCupLocation();
+            onPressed: () async {
+              cupProvider.getCurrentCupLocation();
             }),
         body: Form(
           key: formKey,
@@ -117,70 +113,49 @@ class _AddCupPageState extends State<AddCupPage> {
                 )),
               ]),
               const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                    child: Text(
-                      "Coordinate X: ${currentCupLocation?.latitude.toStringAsFixed(6) ?? 'N/A'}",
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Flexible(
-                    child: Text(
-                      "Coordinate Y: ${currentCupLocation?.longitude.toStringAsFixed(6) ?? 'N/A'}",
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
+              Consumer<CupViewModel>(
+                builder: (context, cupProvider, _) {
+                  final loc = cupProvider.newLocation;
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          "Coordinate X: ${loc?.latitude.toStringAsFixed(6) ?? 'N/A'}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Flexible(
+                        child: Text(
+                          "Coordinate Y: ${loc?.longitude.toStringAsFixed(6) ?? 'N/A'}",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 10),
               ElevatedButton(
                   onPressed: () {
-                    cupProvider.addCup(
-                        int.parse(_eggCount.text),
-                        currentCupLocation!.latitude,
-                        currentCupLocation!.longitude,
-                        int.parse(_larvaeCount.text),
-                        _status.text,
-                        false,
-                        currentOvitrapID);
-                    logger.d(const Text("Adding to Firebase"));
-                    Navigator.pop(context);
+                    if (formKey.currentState!.validate()) {
+                      cupProvider.addCup(
+                          int.parse(_eggCount.text),
+                          cupProvider.newLocation!.latitude,
+                          cupProvider.newLocation!.longitude,
+                          int.parse(_larvaeCount.text),
+                          _status.text,
+                          false,
+                          currentOvitrapID);
+                      cupProvider.newLocation = null;
+                      logger.d(const Text("Adding to Firebase"));
+                      context.pop();
+                    }
                   },
                   child: const Text("Add Cup"))
             ],
           )),
         ));
-  }
-
-  Future<void> setCupLocation() async {
-    logger.d("InSetCup");
-
-    Position? newLocation = await locationService.getCurrentLocation();
-
-    if (mounted) {
-      setState(() {
-        currentCupLocation = newLocation;
-        logger.d(currentCupLocation?.latitude);
-      });
-    }
-
-    await setPreciseCupLocation();
-  }
-
-  Future<void> setPreciseCupLocation() async {
-    logger.d("InSetCoordinate");
-
-    Placemark? newCoordinates =
-        await locationService.getAddress(currentCupLocation!);
-
-    if (mounted) {
-      setState(() {
-        currentPreciseCupLocation = newCoordinates;
-        logger.d(currentPreciseCupLocation?.locality);
-      });
-    }
   }
 }

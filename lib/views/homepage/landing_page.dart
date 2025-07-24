@@ -1,7 +1,8 @@
+import "package:desapv3/viewmodels/auth_notifier.dart";
 import "package:desapv3/viewmodels/cup_viewmodel.dart";
 import "package:desapv3/viewmodels/navigation_link.dart";
 import "package:desapv3/reuseable_widget/app_drawer.dart";
-import "package:desapv3/services/firebase_auth_service.dart";
+import "package:desapv3/viewmodels/user_viewmodel.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:fluttertoast/fluttertoast.dart";
@@ -17,9 +18,16 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<UserViewModel>(context, listen: false).fetchCurrentUser();
+      Provider.of<CupViewModel>(context, listen: false).fetchCups();
+    });
+  }
 
-  final logoutService = FirebaseAuthService();
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   final logger = Logger();
 
@@ -33,8 +41,12 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    final cupProvider = Provider.of<CupViewModel>(context, listen: true);
-    cupProvider.fetchCups;
+    final cupProvider = Provider.of<CupViewModel>(context, listen: false);
+    final authNotifier = Provider.of<AuthNotifier>(context, listen: false);
+    final userProvider = Provider.of<UserViewModel>(context, listen: false);
+
+    userProvider.currentUser = authNotifier.user;
+
     return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
@@ -44,17 +56,7 @@ class _HomepageState extends State<Homepage> {
             icon: const Icon(Icons.logout, color: Colors.black),
             onPressed: () async {
               logger.d("Logging out");
-              await logoutService.signOut();
-
-              if (_firebaseAuth.currentUser == null) {
-                if (context.mounted) {
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, loginRoute, (Route route) => route.isFirst);
-                }
-              } else {
-                toastErrorPopUp(
-                    "We have encountered an issue when logout, please try again.");
-              }
+              await userProvider.signOut(context);
             },
           )
         ],
@@ -64,8 +66,8 @@ class _HomepageState extends State<Homepage> {
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.all(16),
-                padding: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -79,7 +81,7 @@ class _HomepageState extends State<Homepage> {
                   child: LineChart(
                     LineChartData(
                       borderData: FlBorderData(show: false),
-                      gridData: FlGridData(show: false),
+                      gridData: const FlGridData(show: false),
                       titlesData: FlTitlesData(
                         leftTitles: AxisTitles(
                           sideTitles: SideTitles(
@@ -88,7 +90,7 @@ class _HomepageState extends State<Homepage> {
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 value.toString(),
-                                style: TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 12),
                               );
                             },
                           ),
@@ -164,9 +166,14 @@ class _HomepageState extends State<Homepage> {
                           const Text('Total Egg Count',
                               style: TextStyle(fontSize: 16)),
                           const SizedBox(height: 8),
-                          Text("${cupProvider.calcTotalEgg()}",
-                              style: const TextStyle(
-                                  fontSize: 32, fontWeight: FontWeight.bold)),
+                          Consumer<CupViewModel>(
+                            builder: (context, cupProvider, _) {
+                              return Text("${cupProvider.calcTotalEgg()}",
+                                  style: const TextStyle(
+                                      fontSize: 32,
+                                      fontWeight: FontWeight.bold));
+                            },
+                          ),
                         ],
                       ),
                     ),

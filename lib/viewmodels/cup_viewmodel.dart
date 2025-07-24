@@ -1,21 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/models/cup.dart';
 import 'package:desapv3/reuseable_widget/string_extensions.dart';
+import 'package:desapv3/services/location_map_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:logger/logger.dart';
 
 class CupViewModel with ChangeNotifier {
   final List<Cup> _cupList = [];
 
-  bool _isFetchingCups = false;
-
-  bool get isFetchingCups => _isFetchingCups;
-
-  bool get isCupLoaded => _cupList.isNotEmpty;
-
-  List<Cup> get cupList => _cupList;
+  bool _isFetchingCups = false; //Is a cup fetching in progress?
+  bool get isFetchingCups => _isFetchingCups; //Get the status of the fetching progress
+  bool get isCupLoaded => _cupList.isNotEmpty;//Is the list empty?
+  List<Cup> get cupList => _cupList; //Return the cup list
 
   FirebaseFirestore dBaseRef = FirebaseFirestore.instance;
+
+  LocationServices locationService = LocationServices();
+  bool _isFetchingLocation = false;
+  bool get isFetchingLocation => _isFetchingLocation;
+  Position? newLocation;
+  Placemark? newCoordinates;
 
   final logger = Logger();
 
@@ -30,10 +36,9 @@ class CupViewModel with ChangeNotifier {
         'larvaeCount': larvaeCount,
         'status': status,
         'isActive': isActive,
-        'localityCaseID': oviTrapID //
+        'localityCaseID': oviTrapID
       };
 
-      // Add to Firestore
       await dBaseRef.collection('Cup').add(cupData).then((querySnapshot) {
         Cup newCup = Cup(querySnapshot.id.toString(), eggCount, gpsX, gpsY,
             larvaeCount, status, isActive, oviTrapID);
@@ -64,7 +69,7 @@ class CupViewModel with ChangeNotifier {
             data['larvaeCount'] ?? 0,
             data['status'] ?? '',
             data['isActive'] ?? false,
-            data['localityCaseID'] ?? ''); // Also this change
+            data['localityCaseID'] ?? '');
 
         logger.d(cup.cupID);
 
@@ -92,7 +97,7 @@ class CupViewModel with ChangeNotifier {
         'larvaeCount': newCup.larvaeCount,
         'status': newCup.status,
         'isActive': newCup.isActive,
-        'localityCaseID': newCup.ovitrapID //This might need change
+        'localityCaseID': newCup.ovitrapID
       });
 
       int currentCupIndex =
@@ -164,6 +169,27 @@ class CupViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  //Cup Location Setter
+  Future<void> setCupLocation() async {
+    _isFetchingLocation = true;
+    newLocation = await locationService.getCurrentLocation();
+    newCoordinates = await locationService.getAddress(newLocation!);
+    _isFetchingCups = false;
+    notifyListeners();
+  }
+
+//Cup Location Getter
+  Future<Position?> getCurrentCupLocation() async {
+    if (newLocation != null) {
+      return newLocation;
+    } else {
+      await setCupLocation();
+      notifyListeners();
+      return newLocation; //Maybe a better error fixing
+    }
+  }
+
+//Total up all eggs from all ovitraps including inactive cups
   int calcTotalEgg() {
     int totalMosquitoEgg = 0;
 

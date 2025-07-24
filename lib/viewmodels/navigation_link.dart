@@ -17,3 +17,5 @@ const String dengueApprovalRoute = '/dengueApproval';
 const String addDengueCaseRoute = '/addDengueCase';
 const String editDengueCaseRoute = '/editDengueCase';
 const String dengueCaseDetailRoute = '/dengueCaseDetail';
+const String reportManagementRoute = '/reportManagement';
+const String viewReportRoute = '/viewReport';

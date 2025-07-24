@@ -1,9 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
-
-import 'package:desapv3/services/permissions_handling.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:geodesy/geodesy.dart';
 import 'package:logger/logger.dart';
 

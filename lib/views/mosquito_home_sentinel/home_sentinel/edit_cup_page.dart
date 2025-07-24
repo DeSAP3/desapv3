@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:desapv3/viewmodels/cup_viewmodel.dart';
 import 'package:desapv3/viewmodels/navigation_link.dart';
 import 'package:desapv3/models/cup.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
@@ -120,7 +120,9 @@ class _EditCupPageState extends State<EditCupPage> {
                         currentCupInEdit.isActive,
                         currentCupInEdit.ovitrapID));
                     logger.d(const Text("Updating Cup in Firebase"));
-                    Navigator.popAndPushNamed(context, sentinelInfoRoute, arguments: currentCupInEdit.ovitrapID);
+                    // Navigator.popAndPushNamed(context, sentinelInfoRoute,
+                    //     arguments: currentCupInEdit.ovitrapID);
+                    context.pop();
                   },
                   child: const Text("Update Cup"))
             ],

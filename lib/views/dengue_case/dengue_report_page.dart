@@ -1,9 +1,9 @@
+import 'package:desapv3/routing/router_path.dart';
 import 'package:desapv3/viewmodels/dengue_case_viewmodel.dart';
-import 'package:desapv3/viewmodels/navigation_link.dart';
-import 'package:desapv3/viewmodels/route_generator.dart';
 import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class DengueReport extends StatefulWidget {
@@ -45,7 +45,7 @@ class _DengueReportState extends State<DengueReport> {
                 labelWidget: const Text("Add Dengue Case"),
                 backgroundColor: Colors.white70,
                 onTap: () {
-                  Navigator.pushNamed(context, addDengueCaseRoute);
+                  context.go('/addDengueCase');
                 }),
             SpeedDialChild(
                 elevation: 0,
@@ -86,14 +86,13 @@ class _DengueReportState extends State<DengueReport> {
                   padding: const EdgeInsets.all(16),
                   itemCount: dengueCaseProvider.dengueCaseList.length,
                   itemBuilder: (context, index) {
-                    final caseItem = dengueCaseProvider.dengueCaseList[index];
+                    final dengueC = dengueCaseProvider.dengueCaseList[index];
                     final date = DateTime.fromMillisecondsSinceEpoch(
-                        caseItem.dateRPD!.millisecondsSinceEpoch);
+                        dengueC.dateRPD!.millisecondsSinceEpoch);
 
                     return GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, dengueCaseDetailRoute,
-                            arguments: DengueCaseDetailArguments(caseItem));
+                        context.push('/dengueCaseDetail', extra: DengueCaseDetailArguments(dengueC));
                       },
                       child: Card(
                         margin: const EdgeInsets.symmetric(
@@ -106,22 +105,19 @@ class _DengueReportState extends State<DengueReport> {
                               ? IconButton(
                                   onPressed: () {
                                     if (active == 'edit') {
-                                      Navigator.pushNamed(
-                                        context,
-                                        editDengueCaseRoute,
-                                        arguments: EditDengueCaseArguments(
-                                            caseItem, index),
-                                      );
+                                      context.push('/editDengueCase',
+                                          extra: EditDengueCaseArguments(
+                                              dengueC, index));
                                     } else if (active == 'delete') {
                                       dengueCaseProvider
-                                          .deleteDengueCase(caseItem);
+                                          .deleteDengueCase(dengueC);
                                     }
                                   },
                                   icon: Icon(functionIcon(active)))
                               : null,
-                          title: Text(caseItem.patientName!),
+                          title: Text(dengueC.patientName!),
                           subtitle: Text(
-                            "Status: ${caseItem.status}\nReport Time: $date",
+                            "Status: ${dengueC.status}\nReport Time: $date",
                           ),
                           trailing: const Icon(Icons.arrow_forward_ios),
                         ),

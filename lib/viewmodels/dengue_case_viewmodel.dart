@@ -7,14 +7,16 @@ import 'package:logger/logger.dart';
 class DengueCaseViewModel with ChangeNotifier {
   final List<DengueCase> _dengueCaseList = [];
 
-  bool _isFetchingDengueCase = false; //Is a fetching on progress
+  bool _isFetchingDengueCase = false; //Is a dengue case fetching in progress?
 
   bool get isFetchingDengueCase =>
-      _isFetchingDengueCase; //Technically is the dengue case loading
+      _isFetchingDengueCase; //Get the status of the fetching progress?
 
-  bool get isDengueCaseLoaded => _dengueCaseList.isNotEmpty; //Does the list have items?
+  bool get isDengueCaseLoaded =>
+      _dengueCaseList.isNotEmpty; //Is the list empty?
 
-  List<DengueCase> get dengueCaseList => _dengueCaseList; //Return the dengue case list
+  List<DengueCase> get dengueCaseList =>
+      _dengueCaseList; //Return the dengue case list
 
   FirebaseFirestore dBaseRef = FirebaseFirestore.instance;
 
@@ -48,7 +50,6 @@ class DengueCaseViewModel with ChangeNotifier {
         'dataAnalyticsID': dataAnalyticsID
       };
 
-      // Add to Firestore
       await dBaseRef
           .collection('DengueCase')
           .add(dengueCaseData)
@@ -74,7 +75,7 @@ class DengueCaseViewModel with ChangeNotifier {
     }
   }
 
-  //Readers
+//Dengue Case Reader
   Future<List<DengueCase>> fetchDengueCase() async {
     try {
       _dengueCaseList.clear();
@@ -120,7 +121,6 @@ class DengueCaseViewModel with ChangeNotifier {
   //Dengue Case Updater
   Future<void> updateDengueCase(DengueCase newDengueCase, int index) async {
     try {
-      // Update in Firestore
       await dBaseRef
           .collection('DengueCase')
           .doc(newDengueCase.dCaseID)
@@ -146,10 +146,10 @@ class DengueCaseViewModel with ChangeNotifier {
     }
   }
 
+//Update Dengue Case Status in the Firebase
   Future<void> updateCaseStatus(
       DengueCase newDengueCase, String newStatus) async {
     try {
-      // Update in Firestore
       await dBaseRef
           .collection('DengueCase')
           .doc(newDengueCase.dCaseID)
@@ -157,7 +157,7 @@ class DengueCaseViewModel with ChangeNotifier {
         'status': newStatus,
       });
 
-      // Optionally fetch updated data or directly add the new object to the list
+
       final index = _dengueCaseList
           .indexWhere((dc) => dc.dCaseID == newDengueCase.dCaseID);
       _dengueCaseList.update(index, newDengueCase);

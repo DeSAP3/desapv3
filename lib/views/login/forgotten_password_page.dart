@@ -1,5 +1,5 @@
 import 'package:desapv3/reuseable_widget/text_field_widget.dart';
-import 'package:desapv3/services/firebase_auth_service.dart';
+import 'package:desapv3/viewmodels/user_viewmodel.dart';
 import 'package:flutter/material.dart';
 
 class ForgottenPasswordPage extends StatefulWidget {
@@ -10,7 +10,7 @@ class ForgottenPasswordPage extends StatefulWidget {
 }
 
 class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
-  final forgotPasswordService = FirebaseAuthService();
+  final forgotPasswordService = UserViewModel();
   final _email = TextEditingController();
 
   @override

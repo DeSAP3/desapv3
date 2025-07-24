@@ -1,7 +1,7 @@
 class WeatherInfo {
-  String? maxTemperatureCelsius;
-  String? minTemperatureCelsius;
-  String? averageHumidity;
-  String? windspeed;
+  double? maxTemperatureCelsius;
+  double? minTemperatureCelsius;
+  double? averageHumidity;
+  double? windspeed;
 
 }

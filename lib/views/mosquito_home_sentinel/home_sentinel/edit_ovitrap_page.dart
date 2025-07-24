@@ -36,6 +36,8 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
 
   late OviTrap currentOvitrap;
 
+  late final String dengueCaseID; //
+
   @override
   void initState() {
     super.initState();
@@ -244,7 +246,9 @@ class _EditOvitrapPageState extends State<EditOvitrapPage> {
                                 int.parse(_epiWeekInstl.text),
                                 int.parse(_epiWeekRmv.text),
                                 _instlTime,
-                                _removeTime, []),
+                                _removeTime, 
+                                dengueCaseID //
+                                ),
                             widget.index);
                         logger.d(const Text("Edited"));
                         Navigator.pop(context);

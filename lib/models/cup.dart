@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+//This model contains the information required for the Cup class
 class Cup {
   String? cupID;
   int? eggCount;

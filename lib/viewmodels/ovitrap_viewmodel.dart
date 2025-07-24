@@ -7,13 +7,13 @@ import 'package:logger/logger.dart';
 class OvitrapViewModel with ChangeNotifier {
   final List<OviTrap> _oviTrapList = [];
 
-  bool _isFetchingOviTrap = false;
+  bool _isFetchingOviTrap = false; //Is an ovitrap fetching in progress?
 
-  bool get isFetchingOviTrap => _isFetchingOviTrap;
+  bool get isFetchingOviTrap => _isFetchingOviTrap; //Get the status of the fetching progress
 
-  bool get isOviTrapLoaded => _oviTrapList.isNotEmpty;
+  bool get isOviTrapLoaded => _oviTrapList.isNotEmpty; //Is the list empty?
 
-  List<OviTrap> get oviTrapList => _oviTrapList;
+  List<OviTrap> get oviTrapList => _oviTrapList; //Return the ovitrap list
 
   FirebaseFirestore dBaseRef = FirebaseFirestore.instance;
 
@@ -27,7 +27,8 @@ class OvitrapViewModel with ChangeNotifier {
       int epiWeekInstl,
       int epiWeekRmv,
       Timestamp instlTime,
-      Timestamp removeTime) async {
+      Timestamp removeTime,
+      String dengueCaseID) async {
     try {
       Map<String, dynamic> ovitrapData = {
         'location': location,
@@ -37,9 +38,9 @@ class OvitrapViewModel with ChangeNotifier {
         'epiWeekRmv': epiWeekRmv,
         'instlTime': instlTime,
         'removeTime': removeTime,
+        'dengueCaseID': dengueCaseID
       };
 
-      // Add to Firestore
       await dBaseRef
           .collection('OviTrap')
           .add(ovitrapData)
@@ -52,7 +53,8 @@ class OvitrapViewModel with ChangeNotifier {
             epiWeekInstl,
             epiWeekRmv,
             instlTime,
-            removeTime, []);
+            removeTime,
+            dengueCaseID);
         _oviTrapList.add(newOviTrap);
         notifyListeners();
       });
@@ -61,7 +63,7 @@ class OvitrapViewModel with ChangeNotifier {
     }
   }
 
-  //Locality Readers
+  //Ovitrap Readers
   Future<List<OviTrap>> fetchOviTrap() async {
     try {
       _oviTrapList.clear();
@@ -81,9 +83,7 @@ class OvitrapViewModel with ChangeNotifier {
             data['epiWeekRmv'] ?? 0,
             (data['instlTime'] as Timestamp?) ?? Timestamp.now(),
             (data['removeTime'] as Timestamp?) ?? Timestamp.now(),
-            data['cupList'] is Iterable ? List.from(data['cupList']) : []);
-
-        logger.d(ovitrap.instlTime);
+            data['dengueCaseID'] ?? '');
 
         _oviTrapList.add(ovitrap);
         logger.d(ovitrap);
@@ -102,7 +102,6 @@ class OvitrapViewModel with ChangeNotifier {
   //Ovitrap Updater
   Future<void> updateOviTrap(OviTrap newOviTrap, int index) async {
     try {
-      // Update in Firestore
       await dBaseRef.collection('OviTrap').doc(newOviTrap.oviTrapID).update({
         'location': newOviTrap.location,
         'member': newOviTrap.member,
@@ -113,7 +112,6 @@ class OvitrapViewModel with ChangeNotifier {
         'removeTime': newOviTrap.removeTime,
       });
 
-      // Optionally fetch updated data or directly add the new object to the list
       _oviTrapList.update(index, newOviTrap);
       notifyListeners();
     } catch (e) {
@@ -121,6 +119,7 @@ class OvitrapViewModel with ChangeNotifier {
     }
   }
 
+  //Ovitrap Deletor
   Future<void> deleteOviTrap(OviTrap delOviTrap) async {
     await dBaseRef
         .collection('OviTrap')

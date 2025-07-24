@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-Logger logger = Logger();
-
+// This class is mainly handling the permission required for camera access, photo album access and location access
 class PermissionsHandler {
+  Logger logger = Logger();
   Future<bool> requestPermission({required Permission permission}) async {
     PermissionStatus status = await permission.status;
 
@@ -13,7 +13,6 @@ class PermissionsHandler {
       logger.d('Permission Already Granted');
       return true;
     } else {
-      
       status = await permission.request();
 
       if (status.isGranted) {

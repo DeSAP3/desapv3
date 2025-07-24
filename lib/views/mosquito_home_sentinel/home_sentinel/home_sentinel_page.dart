@@ -1,8 +1,9 @@
+import 'package:desapv3/routing/router_path.dart';
 import 'package:desapv3/viewmodels/navigation_link.dart';
-import 'package:desapv3/viewmodels/route_generator.dart';
 import 'package:desapv3/reuseable_widget/app_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:desapv3/viewmodels/ovitrap_viewmodel.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
@@ -26,8 +27,7 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ovitrapProvider =
-        Provider.of<OvitrapViewModel>(context);
+    final ovitrapProvider = Provider.of<OvitrapViewModel>(context);
     final oviTraps = ovitrapProvider.oviTrapList;
     return Scaffold(
         drawer: const AppDrawer(),
@@ -46,7 +46,7 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                   labelWidget: const Text("Add Ovitrap"),
                   backgroundColor: Colors.white70,
                   onTap: () {
-                    Navigator.pushNamed(context, addOvitrapRoute);
+                    context.go('/addOvitrap');
                   }),
               SpeedDialChild(
                   elevation: 0,
@@ -111,56 +111,39 @@ class _HomeSentinelPageState extends State<HomeSentinelPage> {
                                       .millisecondsSinceEpoch);
                           return GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, sentinelInfoRoute,
-                                  arguments: oviTraps[index].oviTrapID);
+                              context.push('/sentinelInfo',
+                                  extra: SentinelInfoArgument(
+                                      oviTraps[index].oviTrapID));
                             },
                             child: Card(
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 8),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(12)),
+                                  borderRadius: BorderRadius.circular(12)),
                               child: ListTile(
                                 leading: active != 'none'
                                     ? IconButton(
                                         onPressed: () {
                                           if (active == 'edit') {
-                                            Navigator.pushNamed(
-                                              context,
-                                              editOvitrapRoute,
-                                              arguments:
-                                                  EditOvitrapArguments(
-                                                      oviTraps[index],
-                                                      index),
-                                            );
-                                          } else if (active ==
-                                              'delete') {
+                                            context.push('/editOvitrap',
+                                                extra: EditOvitrapArguments(
+                                                    oviTraps[index], index));
+                                          } else if (active == 'delete') {
                                             ovitrapProvider
-                                                .deleteOviTrap(
-                                                    oviTraps[index]);
-                                          } else if (active ==
-                                              'generateQR') {
-                                            Navigator.pushNamed(
-                                              context,
-                                              qrCodeGeneratorRoute,
-                                              arguments:
-                                                  QrCodeGenArguments(
-                                                      oviTraps[index]
-                                                          .oviTrapID),
-                                            );
+                                                .deleteOviTrap(oviTraps[index]);
+                                          } else if (active == 'generateQR') {
+                                            context.push('/qrGenerator', extra: QrCodeGenArguments(
+                                                  oviTraps[index].oviTrapID));
                                           }
                                         },
-                                        icon:
-                                            Icon(functionIcon(active)))
+                                        icon: Icon(functionIcon(active)))
                                     : null,
                                 title: Text(oviTraps[index].location!),
                                 subtitle: Text(
                                   "Member: ${oviTraps[index].member}\t\t\t\t\tStatus: ${oviTraps[index].status}\nEpid Week Inst: ${oviTraps[index].epiWeekInstl}\t\t\t\t\tEpid Week Rmv: ${oviTraps[index].epiWeekRmv}\nInst Time: $instlTimeDisplay\nRmv Time: $removeTimeDisplay",
                                 ),
-                                trailing:
-                                    const Icon(Icons.arrow_forward_ios),
+                                trailing: const Icon(Icons.arrow_forward_ios),
                               ),
                             ), //
                           );
